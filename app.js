@@ -16,6 +16,8 @@ const client = new Client({
 });
 const { isDev, prod, dev, mongoDB } = require("./ayarlar.json");
 const token = isDev ? dev.token : prod.token;
+global.isDev = isDev;
+global.botOwner = isDev ? dev.botOwner : prod.botOwner;
 const mongoose = require("mongoose");
 mongoose
   .connect(mongoDB)

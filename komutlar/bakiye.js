@@ -1,32 +1,48 @@
-const { MessageEmbed, Client, CommandInteraction, Message } = require("discord.js");
+const {
+  MessageEmbed,
+  Client,
+  CommandInteraction,
+  Message,
+  EmbedBuilder,
+} = require("discord.js");
 const { User } = require("../utils/schemas");
-const { botOwner } = require("../ayarlar.json");
 module.exports = {
   name: "bakiye",
   description: "Sizin veya başka bir kullanıcının bakiyesini kontrol edin",
   /**
    * @param {Client} client
    * @param {Message} message
+   * @param {String[]} args
    */
-  run: async (client, message) => {
+  run: async (client, message, args) => {
     let user =
-      interaction.options.getUser("kullanıcı") || interaction.member.user;
+      (await message.guild.members.fetch(args[0])).user || message.member.user;
 
-    if (interaction.member.id !== botOwner) {
-      user = interaction.member.user;
+    if (message.member.user.id !== global.botOwner) {
+      user = message.member.user;
     }
     const userData =
       (await User.findOne({ id: user.id })) || new User({ id: user.id });
 
-    const balanceEmbed = new MessageEmbed()
+    const balanceEmbed = new EmbedBuilder()
       .setTitle(`${user.username}'s bakiye`)
       .setDescription("Talep edilen kullanıcının cüzdan ve banka bilgileri")
-      .setColor("YELLOW")
+      .setColor("Yellow")
       .setThumbnail(user.displayAvatarURL())
-      .addField("• Cüzdan", `**\` ${userData.wallet} \`** 🪙`, true)
-      .addField("• Banka", `**\` ${userData.bank} \`** 🪙`, true);
+      .setFields([
+        {
+          name: "• Cüzdan",
+          value: `**\` ${userData.wallet} \`** 🪙`,
+          inline: true,
+        },
+        {
+          name: "• Banka",
+          value: `**\` ${userData.bank} \`** 🪙`,
+          inline: true,
+        },
+      ]);
 
-    return interaction.reply({
+    return message.reply({
       embeds: [balanceEmbed],
     });
   },
