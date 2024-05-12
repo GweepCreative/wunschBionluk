@@ -1,35 +1,43 @@
-const { MessageEmbed, Client, CommandInteraction } = require("discord.js");
+const {
+  MessageEmbed,
+  Client,
+  CommandInteraction,
+  Message,
+} = require("discord.js");
 const Shop = require("../utils/shop");
-const { botOwner } = require("../ayarlar.json");
 module.exports = {
   name: "ürün-ekle",
   description: "Sisteme ürün eklersiniz",
-  options: [
-    {
-      name: "ürün-adı",
-      description: "Ürünün Adı",
-      type: 3,
-      required: true,
-    },
-    {
-      name: "ücret",
-      description: "Ürünün Ücreti",
-      type: 4,
-      required: true,
-      min_value: 30,
-    },
-  ],
   /**
    * @param {Client} client
-   * @param {CommandInteraction} interaction
+   * @param {Message} message
    */
-  run: async (client, interaction) => {
-    if(interaction.member.id !== botOwner) return interaction.reply({embeds:[{title:"Hata", description:"Bu komut bot sahibine özeldir"}], ephemeral:true});
-    let urun = interaction.options.getString("ürün-adı"),
-      ucret = interaction.options.getInteger("ücret"),
-      urun_kod = Math.floor(Math.random() * 100000);
+  run: async (client, message, args) => {
+    if (message.member.id !== global.botOwner)
+      return message.reply({
+        embeds: [
+          { title: "Hata", description: "Bu komut bot sahibine özeldir" },
+        ],
+        ephemeral: true,
+      });
+    let urun = args[0]; // interaction.options.getString("ürün-adı"),
+    ucret = args[1]; //interaction.options.getInteger("ücret"),
+    if (!urun || !ucret)
+      return message.reply({
+        embeds: [
+          {
+            title: "Hata",
+            description: "Doğru kullanım: `!ürün-ekle <ürün-adı> <ücret>`",
+          },
+        ],
+      });
+    if (isNaN(ucret))
+      return message.reply({
+        embeds: [{ title: "Hata", description: "Ücret sayı olmalıdır" }],
+      });
+    urun_kod = Math.floor(Math.random() * 100000);
     await Shop.create({ id: urun_kod, name: urun, balance: ucret });
-    interaction.reply({
+    message.reply({
       embeds: [
         {
           title: "Yeni Ürün Eklendi",

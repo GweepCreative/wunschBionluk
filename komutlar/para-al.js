@@ -1,44 +1,29 @@
-const { MessageEmbed, Client, CommandInteraction } = require("discord.js");
+const { Client, Message, EmbedBuilder } = require("discord.js");
 const { User } = require("../utils/schemas");
-const { botOwner } = require("../ayarlar.json");
 
 module.exports = {
   name: "para-al",
   description: "Kullanıcıdan para alır",
-  options: [
-    {
-      name: "kullanıcı",
-      description: "Kullanıcı",
-      type: 6,
-      required: true,
-    },
-    {
-      name: "miktar",
-      description: "Vermek istediğiniz miktar",
-      type: 4,
-      required: true,
-      min_value: 50,
-    },
-  ],
   /**
    * @param {Client} client
-   * @param {CommandInteraction} interaction
+   * @param {Message} message
+   * @param {String[]} args
    */
-  run: async (client, interaction) => {
-    if (interaction.member.id !== botOwner)
-      return interaction.reply({
+  run: async (client, message,args) => {
+    if (message.member.id !== global.botOwner)
+      return message.reply({
         content: "Bu komutu kullanmak için Bot Sahibi Olmazsınız",
         ephemeral: true,
       });
-    let userId = interaction.options.getUser("kullanıcı").id;
-    let amount = interaction.options.get("miktar").value;
+    let userId = args[0] //interaction.options.getUser("kullanıcı").id;
+    let amount = args[1] //interaction.options.get("miktar").value;
     if (!client.users.fetch(userId))
-      return interaction.reply({
+      return message.reply({
         embeds: [
           { title: "Sistemde böyle bir kullanıcı bulamıyorum", color: "RED" },
         ],
       });
-    const embed = new MessageEmbed({ color: "YELLOW" });
+    const embed = new EmbedBuilder({ color: "Yellow" });
     const userData =
       (await User.findOne({ id: userId })) || new User({ id: userId });
     if (userData.wallet >= amount) {
@@ -51,7 +36,7 @@ module.exports = {
       }
     }
     userData.save();
-    return interaction.reply({
+    return message.reply({
       embeds: [
         embed.setDescription(
           `✅ Kullanıcı hesabından \` ${amount} \` 🪙 tutar para alındı`

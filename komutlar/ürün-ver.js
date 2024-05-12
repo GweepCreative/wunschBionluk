@@ -1,46 +1,39 @@
-const { MessageEmbed, Client, CommandInteraction } = require("discord.js");
+const {
+  MessageEmbed,
+  Client,
+  CommandInteraction,
+  Message,
+} = require("discord.js");
 const Shop = require("../utils/shop");
 const { botOwner } = require("../ayarlar.json");
 const { User } = require("../utils/schemas");
 module.exports = {
   name: "ürün-ver",
   description: "Kullanıcıya ürün verir",
-  options: [
-    {
-      name: "kullanıcı",
-      description: "Ürün vermek istediğiniz kullanıcı",
-      type: 6,
-      required: true,
-    },
-    {
-      name: "ürün-kodu",
-      description: "Verilecek ürün kodu",
-      type: 3,
-      required: true,
-    },
-    {
-      name: "miktar",
-      description: "Ürün miktarı",
-      type: 4,
-      required: true,
-    },
-  ],
   /**
    * @param {Client} client
-   * @param {CommandInteraction} interaction
+   * @param {Message} message
    */
-  run: async (client, interaction) => {
-    if (interaction.member.id !== botOwner) {
-      return interaction.reply({
+  run: async (client, message, args) => {
+    if (message.member.id !== global.botOwner) {
+      return message.reply({
         content: "Bu komutu sadece bot sahibi kullanabilir",
         ephemeral: true,
       });
     }
-    const user = interaction.options.getUser("kullanıcı");
-    const urun = interaction.options.getString("ürün-kodu");
-    const miktar = interaction.options.getInteger("miktar");
+    const userId = args[0]; // interaction.options.getUser("kullanıcı");
+    const urun = args[1]; //interaction.options.getString("ürün-kodu");
+    const miktar = args[2]; //interaction.options.getInteger("miktar");
+
+    if (isNaN(userId) || isNaN(urun) || isNaN(miktar))
+      return message.reply({
+        content:
+          "Komutu hatalı kullandınız. \n Doğru kullanım `!ürün-ver <kullanıcı-Id> <ürün-kodu> <miktar>`",
+        ephemeral: true,
+      });
+    const user = await client.users.fetch(userId);
     if (miktar <= 0) {
-      return interaction.reply({
+      return message.reply({
         content: "Miktar 0'dan büyük olmalıdır",
         ephemeral: true,
       });
@@ -49,7 +42,7 @@ module.exports = {
       (await User.findOne({ id: user.id })) || new User({ id: user.id });
     const product = await Shop.findOne({ id: urun });
     if (!product) {
-      return interaction.reply({
+      return message.reply({
         content: "Ürün bulunamadı",
         ephemeral: true,
       });
@@ -59,7 +52,7 @@ module.exports = {
         { id: user.id, "products.id": urun },
         { $inc: { "products.$.count": miktar } }
       );
-      return interaction.reply({
+      return message.reply({
         content: `${user.tag} kullanıcısına **${miktar}** adet **${product.name}** verildi.`,
       });
       return;
@@ -71,7 +64,7 @@ module.exports = {
         count: miktar,
       });
       await userData.save();
-      interaction.reply({
+      message.reply({
         content: `${user.tag} kullanıcısına **${miktar}** adet **${product.name}** verildi.`,
       });
       return;

@@ -1,27 +1,25 @@
 const { User } = require("../utils/schemas");
 const shop = require("../utils/shop");
-const { MessageEmbed, Client, CommandInteraction } = require("discord.js");
+const { Client, Message } = require("discord.js");
 module.exports = {
   name: "satın-al",
   description: "Belirtilen Ürünü Satın Alırsınız",
-  options: [
-    {
-      name: "ürün-kodu",
-      description: "Satın Alınacak Ürünün Kodu",
-      type: 4,
-      required: true,
-    },
-  ],
   /**
    * @param {Client} client
-   * @param {CommandInteraction} interaction
+   * @param {Message} message
+   * @param {String[]} args
    */
-  run: async (client, interaction) => {
-    let urun_kod = interaction.options.getInteger("ürün-kodu");
-    let user = interaction.member.user;
+  run: async (client, message, args) => {
+    let urun_kod = args[0]; //interaction.options.getInteger("ürün-kodu");
+    let user = message.member.user;
+    if (isNaN(urun_kod))
+      return message.reply({
+        embeds: [{ title: "Hata", description: "Ürün kodu sayı olmalıdır" }],
+      });
+
     let data = (await shop.findOne({ id: urun_kod })) || null;
     if (!data)
-      return interaction.reply({
+      return message.reply({
         embeds: [
           {
             title: "Ürün Bulunamadı",
@@ -32,7 +30,7 @@ module.exports = {
     const userData =
       (await User.findOne({ id: user.id })) || new User({ id: user.id });
     if (userData.wallet < data.balance)
-      return interaction.reply({
+      return message.reply({
         embeds: [{ title: "Hata", description: "Bakiye yetersiz" }],
       });
     await User.updateOne(
@@ -40,7 +38,7 @@ module.exports = {
       { $inc: { wallet: -data.balance }, $push: { products: data } }
     );
 
-    interaction.reply({
+    message.reply({
       embeds: [
         {
           title: "Ürün Satın Alındı",
