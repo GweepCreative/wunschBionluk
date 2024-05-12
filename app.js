@@ -51,6 +51,8 @@ fs.readdir("./events/", (_err, files) => {
   });
 });
 client.on("ready", async () => {
-  console.log(`[INFO] Bot started in ${isDev ? "Development" : "Production"} mode`);
+  console.log(
+    `[INFO] Bot started in ${isDev ? "DEVELOPMENT" : "PRODUCTION"} mode`
+  );
 });
 client.login(token);

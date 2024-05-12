@@ -13,16 +13,16 @@ const { User } = require("../utils/schemas");
  * @param {CommandInteraction} interaction
  */
 module.exports = async (client, interaction) => {
-   if (interaction.member.user.id !== "586822327568695317") {
-     if (
-       interaction.channelId !== "1155193203146895451" &&
-       interaction.channel.parentId !== "1206363617625251850"
+  if (interaction.member.user.id !== global.botOwner) {
+    if (
+      interaction.channelId !== "1155193203146895451" &&
+      interaction.channel.parentId !== "1206363617625251850"
     )
-     return interaction.reply({
-         content: "Bu kanalda komut kullanamazsınız.",
-         ephemeral: true,
-       });
-   }
+      return interaction.reply({
+        content: "Bu kanalda komut kullanamazsınız.",
+        ephemeral: true,
+      });
+  }
   if (interaction.isButton()) {
     if (interaction.customId.startsWith("satinal")) {
       let urun_kod = interaction.customId.split("-")[1];
@@ -45,7 +45,7 @@ module.exports = async (client, interaction) => {
           embeds: [{ title: "Hata", description: "Bakiye yetersiz" }],
         });
       if (userData.products.some((x) => x.id === urun_kod)) {
-       // console.log("if");
+        // console.log("if");
         // Update product count
         await User.updateOne(
           { id: interaction.member.user.id, "products.id": urun_kod },
@@ -53,7 +53,7 @@ module.exports = async (client, interaction) => {
           { upsert: true }
         );
       } else {
-       // console.log("else");
+        // console.log("else");
         data = { ...data._doc, count: 1 };
         await User.updateOne(
           { id: interaction.member.user.id },
