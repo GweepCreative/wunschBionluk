@@ -1,39 +1,40 @@
-const { MessageEmbed, Client, CommandInteraction } = require("discord.js");
-const blackjack = require("discord-blackjack");
+const {
+  MessageEmbed,
+  Client,
+  CommandInteraction,
+  Message,
+  EmbedBuilder,
+} = require("discord.js");
+const blackjack = require("discord-blackjack-v14");
 const prettyMilliseconds = require("pretty-ms");
 const { User } = require("../utils/schemas");
-const { botOwner } = require("../ayarlar.json");
 module.exports = {
   name: "blackjack",
   description: "Blackjack oyunu başlatır",
-  options: [
-    {
-      name: "bahis",
-      description: "Bahis miktarını belirler",
-      type: 4,
-      required: true,
-      min_value: 5,
-      max_value: 50,
-    },
-  ],
   /**
    * @param {Client} client
-   * @param {CommandInteraction} interaction
+   * @param {Message} message
+   * @param {String[]} args
    */
-  run: async (client, interaction) => {
-    const botInteraction = interaction;
+
+  run: async (client, message, args) => {
+    if (!args[0] || isNaN(args[0]))
+      return message.reply("Lütfen bir miktar belirtin.");
     const userData =
-      (await User.findOne({ id: botInteraction.member.user.id })) ||
-      new User({ id: botInteraction.member.user.id });
-      
+      (await User.findOne({ id: message.member.user.id })) ||
+      new User({ id: message.member.user.id });
+
     if (userData.cooldowns.blackjack > Date.now())
-      return botInteraction.reply({
+      return message.reply({
         embeds: [
-          new MessageEmbed().setColor("YELLOW").setDescription(
-            `⌛ **\`${prettyMilliseconds(userData.cooldowns.blackjack - Date.now(), {
-              verbose: true,
-              secondDecimalDigits: 0,
-            })
+          new MessageEmbed().setColor("Yellow").setDescription(
+            `⌛ **\`${prettyMilliseconds(
+              userData.cooldowns.blackjack - Date.now(),
+              {
+                verbose: true,
+                secondDecimalDigits: 0,
+              }
+            )
               .replace("minutes", "dakika")
               .replace(
                 "seconds",
@@ -43,24 +44,24 @@ module.exports = {
         ],
         ephemeral: true,
       });
-	  if (botInteraction.member.user.id !== botOwner){
-		   //await User.updateOne({id:interaction.member.user.id},{$inc:{cooldowns:{blackjack:Date.now() + 1000 * 60 * 15}}},{upsert:true})
-		userData.cooldowns.blackjack =    Date.now() + 1000 * 60 * 7
-		userData.save();
-	  }		   
-    const bet = botInteraction.options.getInteger("bahis");
-    let game = await blackjack(botInteraction);
+    if (message.member.user.id !== global.botOwner) {
+      //await User.updateOne({id:interaction.member.user.id},{$inc:{cooldowns:{blackjack:Date.now() + 1000 * 60 * 15}}},{upsert:true})
+      userData.cooldowns.blackjack = Date.now() + 1000 * 60 * 7;
+      userData.save();
+    }
+    const bet = args[0] || 100;
+    let game = await blackjack(message);
 
     switch (game.result) {
       case "WIN":
         const point = Math.floor(Math.random() * 10);
         await User.updateOne(
-          { id: botInteraction.user.id },
+          { id: message.member.user.id },
           { $inc: { xpPoint: point, wallet: bet * 2 } }
         );
-        botInteraction.channel.send({
+        message.channel.send({
           embeds: [
-            new MessageEmbed()
+            new EmbedBuilder()
               .setTitle("Sen kaznadın!")
               .setDescription(
                 `Bu oyundan **${
@@ -72,10 +73,10 @@ module.exports = {
         break;
       case "LOSE":
         await User.updateOne(
-          { id: botInteraction.user.id },
+          { id: message.member.user.id },
           { $inc: { wallet: -bet } }
         );
-        botInteraction.channel.send({
+        message.channel.send({
           content: "Maalesef ki bu oyunu kaybettin. Başka sefere!",
         });
     }

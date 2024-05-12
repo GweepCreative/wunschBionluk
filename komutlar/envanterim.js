@@ -1,28 +1,31 @@
-const { MessageEmbed, Client, CommandInteraction } = require("discord.js");
+const {
+  EmbedBuilder,
+  Client,
+  CommandInteraction,
+  Message,
+} = require("discord.js");
 const { User } = require("../utils/schemas");
 module.exports = {
   name: "envanterim",
   description: "Sahip olduğunuz envanterleri gösterir",
-  options: [],
+
   /**
    * @param {Client} client
-   * @param {CommandInteraction} interaction
+   * @param {Message} message
    */
-  run: async (client, interaction) => {
-    const user = interaction.member.user;
+  run: async (client, message) => {
+    const user = message.member.user;
     let total = 0;
     let options = [];
     const userData =
       (await User.findOne({ id: user.id })) || new User({ id: user.id });
-    const embed = new MessageEmbed()
-      .setColor("YELLOW")
-      .setAuthor({
-        name: `${user.tag} kişisinin envanteri`,
-        iconURL: user.avatarURL({ dynamic: true }),
-      });
+    const embed = new EmbedBuilder().setColor("Yellow").setAuthor({
+      name: `${user.tag} kişisinin envanteri`,
+      iconURL: user.avatarURL({ dynamic: true }),
+    });
     const products = userData.products.sort((a, b) => b.balance - a.balance);
     if (!products.length || products.length <= 0)
-      return interaction.reply({
+      return message.reply({
         embeds: [
           {
             title: "Envanteriniz Boş",
@@ -31,7 +34,7 @@ module.exports = {
         ],
       });
     products.forEach((x) => {
-      total += x.balance*x.count;
+      total += x.balance * x.count;
       options.push({
         label: `${x.name} - Ücret: ${x.balance}`,
         value: `${x.id}`,
@@ -39,12 +42,16 @@ module.exports = {
       });
     });
     products.slice(0, 9).forEach((x) => {
-      embed.addField(x.name, `Ücret: ${x.balance}\nÜrün kodu: ${x.id}\nAdet:${x.count}`, true);
+      embed.addFields({
+        name: x.name,
+        value: `Ücret: ${x.balance}\nÜrün kodu: ${x.id}\nAdet:${x.count}`,
+        inline: true,
+      });
     });
     embed.setFooter({
       text: `Envanter Değeri: ${total} 💰`,
       iconURL: user.avatarURL({ dynamic: true }),
     });
-    interaction.reply({ embeds: [embed] });
+    message.reply({ embeds: [embed] });
   },
 };

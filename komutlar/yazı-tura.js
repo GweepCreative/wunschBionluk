@@ -1,5 +1,4 @@
 const { EmbedBuilder, Client, Message } = require("discord.js");
-const blackjack = require("discord-blackjack");
 const { User } = require("../utils/schemas");
 const prettyMilliseconds = require("pretty-ms");
 const { botOwner } = require("../ayarlar.json");

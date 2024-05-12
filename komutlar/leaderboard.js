@@ -1,8 +1,8 @@
 const {
-  MessageEmbed,
   Client,
   CommandInteraction,
   MessageAttachment,
+  Message,
 } = require("discord.js");
 const { LeaderboardBuilder, Font } = require("canvacord");
 const { User } = require("../utils/schemas");
@@ -14,10 +14,10 @@ module.exports = {
   options: [],
   /**
    * @param {Client} client
-   * @param {CommandInteraction} interaction
+   * @param {Message} message
    */
-  run: async (client, interaction) => {
-    const message = await interaction.reply({
+  run: async (client, message) => {
+    const msg = await message.reply({
       content: "Liderlik tablosu oluşturuluyor...",
       fetchReply: true,
     });
@@ -27,7 +27,9 @@ module.exports = {
       if (client.users.cache.has(user.id))
         players.push({
           avatar:
-            client.users.cache.get(user.id)  .avatarURL({ dynamic: false, size: 512, format: "png" }) ||
+            client.users.cache
+              .get(user.id)
+              .avatarURL({ dynamic: false, size: 512, format: "png" }) ||
             "https://cdn.discordapp.com/embed/avatars/0.png",
           displayName: client.users.cache.get(user.id).displayName,
           rank: i + 1,
@@ -37,7 +39,7 @@ module.exports = {
         });
     }
     //console.log(players);
-    if(players.length === 0) return message.edit("Henüz bir lider yok.");
+    if (players.length === 0) return msg.edit("Henüz bir lider yok.");
     const leaderboard = new LeaderboardBuilder()
       .setHeader({
         title: "Sanalika",
@@ -45,13 +47,13 @@ module.exports = {
         image: interaction.guild.iconURL({ dynamic: false }),
       })
       .setPlayers(players)
- 
+
       // .setStyle({ width: 600, height: 600 })
       .setBackground("https://i.hizliresim.com/a7ykk13.png")
       .setTextStyles({ xp: "Cash" });
     await leaderboard.build({ format: "png" }).then((data) => {
       const dosya = new MessageAttachment(data, "liderlik.png");
-      message.edit({ content: "\u200B", files: [dosya] });
+      msg.edit({ content: "\u200B", files: [dosya] });
     });
   },
 };

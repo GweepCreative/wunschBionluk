@@ -10,12 +10,12 @@ const roles = {
   9: "1207702184406421534",
   10: "1207702220305473667",
 };
-async function upLevel(interaction, userId, level) {
+async function upLevel(message, userId, level) {
 	if(level > 10) return;
   const roleId = roles[level] || undefined;
   if (roleId == undefined) return;
   try {
-    await interaction.member.roles.add(roleId);
+    await message.member.roles.add(roleId);
   } catch (err) {
     console.log(`[UPLEVEL ERROR] | ${err}`);
   }

@@ -1,8 +1,8 @@
 const {
   Client,
   CommandInteraction,
-  MessageActionRow,
-  MessageButton,
+  ActionRowBuilder,
+  ButtonBuilder,
 } = require("discord.js");
 const fs = require("fs");
 const Shop = require("../utils/shop");
@@ -105,12 +105,12 @@ module.exports = async (client, interaction) => {
         },
       ],
       components: [
-        new MessageActionRow().addComponents(
-          new MessageButton()
+        new ActionRowBuilder().addComponents(
+          new ButtonBuilder()
             .setCustomId(`satinal-${kod}`)
             .setEmoji("💰")
             .setLabel("Satın Al")
-            .setStyle("PRIMARY")
+            .setStyle("Primary")
         ),
       ],
     });

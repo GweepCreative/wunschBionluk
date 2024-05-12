@@ -1,4 +1,4 @@
-const { MessageEmbed, Client, CommandInteraction } = require("discord.js");
+const { MessageEmbed, Client, CommandInteraction, Message, EmbedBuilder } = require("discord.js");
 const { User } = require("../utils/schemas");
 const prettyMilliseconds = require("pretty-ms");
 const { upLevel } = require("../utils/xpCal");
@@ -6,22 +6,21 @@ const { botOwner } = require("../ayarlar.json");
 module.exports = { 
   name: "cash",      
   description: "Rastgele miktarda para kazan",
-  options: [],
+
   /**
    * @param {Client} client
-   * @param {CommandInteraction} interaction
+   * @param {Message} message
    */
-  run: async (client, interaction) => { 
+  run: async (client, message) => { 
 
-  const yedek = await interaction;
-    const user = interaction.member.user;
+    const user = message.member.user;
     const userData =
       (await User.findOne({ id: user.id })) || new User({ id: user.id });
     let userxp = userData.xp;
     if (userData.cooldowns.cash > Date.now())
-      return await yedek.reply({
+      return await message.reply({
         embeds: [
-          new MessageEmbed().setColor("YELLOW").setDescription(
+          new EmbedBuilder().setColor("Yellow").setDescription(
             `⌛ **\`${prettyMilliseconds(userData.cooldowns.cash - Date.now(), {
               verbose: true,
               secondDecimalDigits: 0,
@@ -41,37 +40,27 @@ module.exports = {
       userData.xpPoint = userData.xpPoint - 20000;
       userData.gerekli = 20000;
 
-      await upLevel(interaction, user.id, userxp);
+      await upLevel(message, user.id, userxp);
     }
 
     userData.xpPoint += amount * 10; 
     userData.xp = userxp;
     userData.wallet += amount;
-    if (interaction.member.user.id !== botOwner)
+    if (message.member.user.id !== botOwner)
       userData.cooldowns.cash = Date.now() + 1000 * 15;
     userData.save();
 
-    const workEmbed = new MessageEmbed()
+    const workEmbed = new EmbedBuilder()
       .setDescription(`\` ${amount} \` SGAT Cash kazandınız 🪙`)
-      .setColor("YELLOW");    
+      .setColor("Yellow");    
  
-    return await yedek.reply({ embeds: [workEmbed] });
+    return await message.reply({ embeds: [workEmbed] });
   },
 };
 function uretSeviyeyeGore(seviye) {
-  if (seviye < 10) {
-    return Math.floor(Math.random() * 10);
+  if (seviye < 5) {
+    return Math.floor(Math.random() * 5);
   } else {
-    return Math.floor(Math.random() * 7);
+    return Math.floor(Math.random() * 2);
   }
-  // Kullanıcının seviyesine göre ağırlık ekleyerek rastgele sayı üretme
-  // const olasilikFaktoru = seviye / 10; // Seviyeyi 0 ile 1 arasına ölçekle
-  // const rastgeleSayi = Math.random();
-
-  // // 1 ile 10 arasında rastgele sayı üretme
-  // const uretilenSayi = Math.floor(
-  //   1 + (10 - 1) * Math.pow(rastgeleSayi, olasilikFaktoru)
-  // );
-
-  // return uretilenSayi;
 }

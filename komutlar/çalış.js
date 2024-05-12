@@ -1,4 +1,4 @@
-const { MessageEmbed, Client, CommandInteraction } = require("discord.js");
+const { MessageEmbed, Client, CommandInteraction, Message, EmbedBuilder } = require("discord.js");
 const { User } = require("../utils/schemas");
 const prettyMilliseconds = require("pretty-ms");
 const { botOwner } = require("../ayarlar.json");
@@ -20,20 +20,19 @@ const jobs = [
 module.exports = {
   name: "çalış",
   description: "Bir işte çalışırsınız",
-  options: [],
   /**
    * @param {Client} client
-   * @param {CommandInteraction} interaction
+   * @param {Message} message
    */
-  run: async (client, interaction) => {
-    const user = interaction.member.user;
+  run: async (client, message) => {
+    const user = message.member.user;
     const userData =
       (await User.findOne({ id: user.id })) || new User({ id: user.id });
 
     if (userData.cooldowns.work > Date.now())
-      return interaction.reply({
+      return message.reply({
         embeds: [
-          new MessageEmbed().setColor("YELLOW").setDescription(
+          new EmbedBuilder().setColor("Yellow").setDescription(
             `⌛ **\`${prettyMilliseconds(userData.cooldowns.work - Date.now(), {
               verbose: true,
               secondDecimalDigits: 0,
@@ -57,21 +56,21 @@ module.exports = {
       userData.xpPoint = 0;
       userData.gerekli = 20000;
 
-      await upLevel(interaction, user.id, userxp);
+      await upLevel(message, user.id, userxp);
     }
     userData.xpPoint += amount * 10;
     userData.xp = userxp;
     userData.wallet += amount;
-    if (interaction.member.user.id !== botOwner)
+    if (message.member.user.id !== botOwner)
       userData.cooldowns.work = Date.now() + 1000 * 60 * 60 * 3; // 3 saat
     userData.save();
 
-    const workEmbed = new MessageEmbed()
+    const workEmbed = new EmbedBuilder()
       .setDescription(
         `**\` ${job} \`** olarak çalıştınız ve \` ${amount} \` SGAT Cash kazandınız 🪙`
       )
-      .setColor("YELLOW");
+      .setColor("Yellow");
 
-    return interaction.reply({ embeds: [workEmbed] });
+    return message.reply({ embeds: [workEmbed] });
   },
 };

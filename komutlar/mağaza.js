@@ -2,28 +2,29 @@ const {
   MessageEmbed,
   Client,
   CommandInteraction,
-  MessageActionRow,
-  MessageSelectMenu,
+  ActionRowBuilder,
+  StringSelectMenuBuilder,
+  Message,
+  EmbedBuilder,
 } = require("discord.js");
 const Shop = require("../utils/shop");
 module.exports = {
   name: "mağaza",
   description: "Mazağayı Gösterir",
-  options: [],
   /**
    * @param {Client} client
-   * @param {CommandInteraction} interaction
+   * @param {Message} message
    */
-  run: async (client, interaction) => {
+  run: async (client, message) => {
     let urunler = await Shop.find();
-    if (urunler.length < 1) return interaction.reply("Henüz hiç ürün yok");
+    if (urunler.length < 1) return message.reply("Henüz hiç ürün yok");
     let optins = [];
-    let embed = new MessageEmbed()
+    let embed = new EmbedBuilder()
       .setTitle("Mağaza")
       .setDescription(
         `En çok beğenilen ürünler aşağıda sırlanmıştır. Dilersen onun yenine menüden seçim yapabilirsin`
       )
-      .setColor("GOLD");
+      .setColor("Gold");
     urunler
       .sort((a, b) => b.balance - a.balance)
       .forEach((x) => {
@@ -37,16 +38,16 @@ module.exports = {
       .sort((a, b) => b.balance - a.balance)
       .slice(0, 9)
       .forEach((x) => {
-        embed.addField(x.name, `${x.balance} 🪙\nÜrün Kodu: ${x.id}`, true);
+        embed.addFields({name:x.name,value: `${x.balance} 🪙\nÜrün Kodu: ${x.id}`,inline: true});
       });
-    const row = new MessageActionRow().addComponents(
-      new MessageSelectMenu()
+    const row = new ActionRowBuilder().addComponents(
+      new StringSelectMenuBuilder()
         .setCustomId("urunler")
         .setMinValues(1)
         .setMaxValues(1)
         .setPlaceholder("Görmek istediğiniz ürünü seçin")
         .setOptions(optins)
     );
-    interaction.reply({ embeds: [embed], components: [row] });
+    message.reply({ embeds: [embed], components: [row] });
   },
 };
