@@ -3,10 +3,13 @@ const {
   CommandInteraction,
   ActionRowBuilder,
   ButtonBuilder,
+  EmbedBuilder,
 } = require("discord.js");
 const fs = require("fs");
 const Shop = require("../utils/shop");
 const { User } = require("../utils/schemas");
+const Task = require("../utils/task");
+const ms = require("ms");
 /**
  *
  * @param {Client} client
@@ -24,6 +27,7 @@ module.exports = async (client, interaction) => {
       });
   }
   if (interaction.isButton()) {
+   
     if (interaction.customId.startsWith("satinal")) {
       let urun_kod = interaction.customId.split("-")[1];
       let data = await Shop.findOne({ id: urun_kod });
@@ -78,7 +82,8 @@ module.exports = async (client, interaction) => {
       });
     }
   }
-  if (interaction.isAnySelectMenu()) {
+  if (interaction.isStringSelectMenu()) {
+   
     let kod = interaction.values[0];
 
     let data = await Shop.findOne({ id: kod });
