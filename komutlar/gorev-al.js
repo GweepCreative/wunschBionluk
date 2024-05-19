@@ -16,8 +16,14 @@ module.exports = {
     const tasks = await Task.find();
     const task = tasks[Math.floor(Math.random() * tasks.length)];
     const userData = await User.findOne({ id: message.author.id });
-    if (userData.tasks?.isActive)
-      return message.reply("Zaten bir göreviniz var");
+    if (userData.tasks && userData.tasks.isActive)
+      return message.reply("Zaten aktif bir göreviniz var");
+    else if(userData.tasks.isActive == false) {
+      return message.reply({
+        content:
+          "Lütfen önce yetkililerin önceki görevinizi onaylamasını bekleyin.",
+      });
+    }
     userData.tasks = {
       isActive: true,
       title: task.title,
