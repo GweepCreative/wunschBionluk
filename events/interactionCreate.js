@@ -4,6 +4,7 @@ const {
   ActionRowBuilder,
   ButtonBuilder,
   EmbedBuilder,
+  ButtonStyle,
 } = require("discord.js");
 const fs = require("fs");
 const Shop = require("../utils/shop");
@@ -27,7 +28,68 @@ module.exports = async (client, interaction) => {
       });
   }
   if (interaction.isButton()) {
-   
+    if (interaction.customId.startsWith("onayla")) {
+      const userId = interaction.customId.split("_")[1];
+      const userData = await User.findOne({ id: userId });
+      userData.wallet += userData.tasks.prize;
+      userData.cooldowns.task = Date.now() + 1000 * 60 * 60 * 12; // 12 saat
+      userData.complatedTasks.push({
+        taskId: userData.tasks.taskId,
+        prize: userData.tasks.prize,
+        complatedAt: new Date(),
+      });
+      try {
+        client.users.cache.get(userId).send({
+          content: `\`${userData.tasks.title}\` Göreviniz başarıyla onaylandı. Ödül olarak **${userData.tasks.prize}** Cash kazandınız`,
+        });
+      } catch {}
+      userData.tasks = null;
+      userData.save();
+  
+      interaction.message.edit({
+        components: [
+          new ActionRowBuilder().setComponents(
+            new ButtonBuilder()
+              .setLabel(`${interaction.member.user.username} tarafından onaylandı`)
+              .setDisabled(true)
+              .setCustomId("reddet")
+              .setStyle(ButtonStyle.Success)
+          ),
+        ],
+      });
+      interaction.reply({
+        content: "Görev başarıyla onaylandı",
+        ephemeral: true,
+      });
+    } else if (interaction.customId.startsWith("reddet")) {
+      const userId = interaction.customId.split("_")[1];
+      const userData = await User.findOne({ id: userId });
+
+      try {
+        client.users.cache.get(userId).send({
+          content: `\`${userData.tasks.title}\` Göreviniz reddedildi`,
+        });
+      } catch {}
+      userData.tasks = null;
+      
+      userData.save();
+      interaction.message.edit({
+        components: [
+          new ActionRowBuilder().setComponents(
+            new ButtonBuilder()
+              .setLabel(`${interaction.member.user.username} tarafından reddedildi`)
+              .setDisabled(true)
+              .setCustomId("reddet")
+              .setStyle(ButtonStyle.Danger)
+          ),
+        ],
+      });
+      interaction.reply({
+        content: "Görev reddedildi",
+        ephemeral: true,
+      });
+    }
+
     if (interaction.customId.startsWith("satinal")) {
       let urun_kod = interaction.customId.split("-")[1];
       let data = await Shop.findOne({ id: urun_kod });
@@ -83,7 +145,6 @@ module.exports = async (client, interaction) => {
     }
   }
   if (interaction.isStringSelectMenu()) {
-   
     let kod = interaction.values[0];
 
     let data = await Shop.findOne({ id: kod });

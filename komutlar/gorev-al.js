@@ -18,12 +18,27 @@ module.exports = {
     const userData = await User.findOne({ id: message.author.id });
     if (userData.tasks && userData.tasks.isActive)
       return message.reply("Zaten aktif bir göreviniz var");
-    else if(userData.tasks.isActive == false) {
+    else if (userData?.tasks?.isActive == false) {
       return message.reply({
         content:
           "Lütfen önce yetkililerin önceki görevinizi onaylamasını bekleyin.",
       });
     }
+    if (userData.cooldowns.task > Date.now())
+      return message.reply({
+        embeds: [
+          embed.setDescription(
+            `⌛ Zaten yakın zamanda görev aldınız, lütfen yeni görev almak için **\`${prettyMilliseconds(
+              userData.cooldowns.daily - Date.now(),
+              { verbose: true, secondsDecimalDigits: 0 }
+            )
+              .replace("hours", "saat")
+              .replace("minutes", "dakika")
+              .replace("seconds", "saniye")}\`** bekleyin`
+          ),
+        ],
+        ephemeral: true,
+      });
     userData.tasks = {
       isActive: true,
       title: task.title,

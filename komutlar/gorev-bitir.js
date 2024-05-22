@@ -23,6 +23,21 @@ module.exports = {
     const userData = await User.findOne({ id: message.author.id });
     if (!userData.tasks?.isActive)
       return message.reply("Aktif bir göreviniz yok");
+    //Deadline check
+    if (userData.tasks.deadline < Date.now()) {
+      userData.tasks = null;
+      userData.save();
+      return message.reply({
+        embeds: [
+          new EmbedBuilder()
+            .setTitle("Görev Süresi Doldu")
+            .setDescription(
+              `Görev süresi dolduğu için göreviniz sonlandırıldı. Lütfen yeni bir görev alınız`
+            )
+            .setColor("Red"),
+        ],
+      });
+    }
     userData.tasks.isActive = false;
     userData.save();
     message.guild.channels.cache.get("1241853620710932600").send({
@@ -41,6 +56,11 @@ module.exports = {
             {
               name: `Görev Ödülü`,
               value: `${userData.tasks.prize} Cash`,
+              inline: true,
+            },
+            {
+              name: `Görev Süresi`,
+              value: `${ms((new Date(userData.tasks.deadline)-new Date(userData.tasks.createdAt)), { long: true })} `,
               inline: true,
             },
             {
@@ -66,11 +86,11 @@ module.exports = {
         new ActionRowBuilder().setComponents(
           new ButtonBuilder()
             .setLabel("Onayla")
-            .setCustomId(`onayla_${userData.tasks.taskId}`)
+            .setCustomId(`onayla_${message.member.id}`)
             .setStyle(ButtonStyle.Success),
           new ButtonBuilder()
             .setLabel("Reddet")
-            .setCustomId(`reddet_${userData.tasks.taskId}`)
+            .setCustomId(`reddet_${message.member.id}`)
             .setStyle(ButtonStyle.Danger)
         ),
       ],
@@ -83,7 +103,7 @@ module.exports = {
             `Görev başarıyla sonlandırıldı! Lütfen yetkililerin onaylamasını bekleyiniz\n**Görev ID: **\`${
               userData.tasks.taskId
             }\`\n**Ödül: **\`${userData.tasks.prize} Cash\`\n**Süre: **\`${ms(
-              Number(userData.tasks.deadline),
+              Number(userData.tasks.deadline - userData.tasks.createdAt),
               {
                 long: true,
               }

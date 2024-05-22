@@ -21,6 +21,7 @@ const User = new mongoose.Schema({
   gerekli: { type: Number, default: 20000 },
   products: { type: Array, default: [] },
   cooldowns: {
+    task: { type: Date },
     work: { type: Date },
     beg: { type: Date },
     cash: { type: Date },

@@ -8,6 +8,7 @@ const { User } = require("../utils/schemas");
 module.exports = {
   name: "envanterim",
   description: "Sahip olduğunuz envanterleri gösterir",
+  isAdmin: false,
 
   /**
    * @param {Client} client

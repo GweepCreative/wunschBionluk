@@ -9,6 +9,7 @@ const { User } = require("../utils/schemas");
 module.exports = {
   name: "bakiye",
   description: "Sizin veya başka bir kullanıcının bakiyesini kontrol edin",
+  isAdmin: false,
   /**
    * @param {Client} client
    * @param {Message} message

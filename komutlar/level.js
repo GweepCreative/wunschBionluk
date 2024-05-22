@@ -4,6 +4,9 @@ const {
   MessageEmbed,
   Permissions,
   MessageAttachment,
+  Message,
+  EmbedBuilder,
+  AttachmentBuilder,
 } = require("discord.js");
 const {
   Font,
@@ -18,68 +21,17 @@ const { User } = require("../utils/schemas");
 module.exports = {
   name: "level",
   description: "Seviyeler",
-  type: 1,
-  default_permission: true,
-  options: [
-    {
-      name: "bilgi",
-      description: "Kullanıcının seviye bilgisini gösterir",
-      type: 1,
-      options: [
-        {
-          name: "kullanıcı",
-          description: "Seviye bilgilerini gösterilecek kullanıcıyı seç",
-          type: 6,
-          required: false,
-        },
-      ],
-    },
-    {
-      name: "ayarla",
-      description: "Kullanıcının seviye bilgisini ayarlar",
-      type: 1,
-      options: [
-        {
-          name: "kullanıcı",
-          description: "Seviye bilgilerini ayarlanıcak kullanıcıyı seç",
-          type: 6,
-          required: true,
-        },
-        {
-          name: "seviye",
-          description: "Yeni seviyesi",
-          type: 4,
-          required: true,
-        },
-      ],
-    },
-    {
-      name: "sıfırla",
-      description: "Kullanıcının seviye bilgisini sıfırlar",
-      type: 1,
-      options: [
-        {
-          name: "kullanıcı",
-          description: "Seviye bilgilerini sıfırlanacak kullanıcıyı seç",
-          type: 6,
-          required: true,
-        },
-      ],
-    },
-  ],
   /**
    *
    * @param {Client} client
-   * @param {CommandInteraction} interaction
+   * @param {Message} message
+   * @param {String[]} args
    */
-  run: async (client, interaction) => {
-   
-    let subCmd = interaction.options.getSubcommand();
+  run: async (client, message, args) => {
+    let subCmd = args[0];
     switch (subCmd) {
       case "ayarla": {
-        if (
-          interaction.member.user.id != botOwner 
-        ) {
+        if (interaction.member.user.id != botOwner) {
           interaction.reply({
             ephemeral: true,
             embeds: [
@@ -112,30 +64,29 @@ module.exports = {
         break;
       }
       case "sıfırla": {
-        if (
-          interaction.member.user.id != botOwner
-        ) {
-          interaction.reply({
+        if (message.member.user.id != global.botOwner) {
+          message.reply({
             ephemeral: true,
             embeds: [
-              new MessageEmbed()
+              new EmbedBuilder()
                 .setDescription(
                   "Bu komutu kullanmak için Sunucu Yöneticisi olman gerekiyor"
                 )
-                .setColor("RED"),
+                .setColor("Red"),
             ],
           });
           return;
         }
-        const member = interaction.options.getMember("kullanıcı");
+        const member =
+          message.guild.members.cache.get(args[1]) || message.member;
         await User.updateOne(
           { id: member.user.id },
           { $set: { xp: 0, xpPoint: 0, gerekli: 20000 } },
           { upsert: true }
         );
-        interaction.reply({
+        message.reply({
           embeds: [
-            new MessageEmbed()
+            new EmbedBuilder()
               .setColor("#2F3136")
               .setTitle("Seviye Sıfırlandı")
               .setDescription(
@@ -146,12 +97,12 @@ module.exports = {
         break;
       }
       case "bilgi": {
-        const lvlInteraction = await interaction.reply({
+        const lvlInteraction = await message.reply({
           content: "Hazırlanıyor",
           ephemeral: true,
         });
-        let member =
-          interaction.options.getMember("kullanıcı") || interaction.member;
+        const member =
+          message.guild.members.cache.get(args[1].replace(/[<>@!]/g,"")) || message.member;
         try {
           let x =
             (await User.findOne({ id: member.id })) ||
@@ -170,7 +121,7 @@ module.exports = {
             .setAvatar(member.user.avatarURL({ size: 1024 }))
             .setCurrentXP(x.xpPoint)
             .setRequiredXP(x.gerekli)
-			  .setStyles({
+            .setStyles({
               progressbar: {
                 container: { className: "bg-[#23272a]" },
                 track: { className: "bg-orange-500" },
@@ -183,21 +134,23 @@ module.exports = {
             .setLevel(x.xp)
             .setOverlay(90)
             .setBackground("#23272a")
-            .setStatus(member?.presence?.status ? member.presence.status : "dnd")
+            .setStatus(
+              member?.presence?.status ? member.presence.status : "dnd"
+            )
             .setGraphemeProvider(BuiltInGraphemeProvider.FluentEmojiFlat);
           rank
             .build({ format: "png" })
             .then((data) => {
-              const dosya = new MessageAttachment(data, "seviye.png");
-              interaction.channel.send({ files: [dosya] });
+              const dosya = new AttachmentBuilder(data, "seviye.png");
+              lvlInteraction.edit({ content: "Leveliniz", files: [dosya] });
             })
             .catch((err) => {
               console.log(err);
-              interaction.channel.send({
-                ephemeral: true,
+              lvlInteraction.edit({
+                content: "Leveliniz",
                 embeds: [
-                  new MessageEmbed()
-                    .setColor("RED")
+                  new EmbedBuilder()
+                    .setColor("Red")
                     .setDescription(
                       "Seviye bilgileri alınırken bir hata ile karşılaşıldı."
                     ),
@@ -206,17 +159,29 @@ module.exports = {
             });
         } catch (err) {
           console.log(err);
-          interaction.channel.send({
+          message.channel.send({
             ephemeral: true,
             embeds: [
-              new MessageEmbed()
-                .setColor("RED")
+              new EmbedBuilder()
+                .setColor("Red")
                 .setDescription(
                   "Seviye bilgileri alınırken bir hata ile karşılaşıldı."
                 ),
             ],
           });
         }
+        break;
+      }
+      default: {
+        message.reply({
+          embeds: [
+            new EmbedBuilder()
+              .setColor("Red")
+              .setDescription(
+                "Geçersiz bir alt komut girdiniz. Lütfen `ayarla`, `sıfırla` veya `bilgi` komutlarından birini girin.\n`!level <bilgi|ayarla|sıfırla> <kullanıcı> <seviye>`"
+              ),
+          ],
+        });
       }
     }
   },

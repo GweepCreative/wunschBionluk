@@ -5,6 +5,7 @@ const { upLevel } = require("../utils/xpCal");
 module.exports = {
   name: "günlük",
   description: "Günlük ödülünü al",
+  isAdmin: false,
   /**
    * @param {Client} client
    * @param {Message} message

@@ -6,6 +6,7 @@ const { botOwner } = require("../ayarlar.json");
 module.exports = { 
   name: "cash",      
   description: "Rastgele miktarda para kazan",
+  isAdmin: false,
 
   /**
    * @param {Client} client

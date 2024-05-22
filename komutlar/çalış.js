@@ -20,6 +20,7 @@ const jobs = [
 module.exports = {
   name: "çalış",
   description: "Bir işte çalışırsınız",
+  isAdmin: false,
   /**
    * @param {Client} client
    * @param {Message} message

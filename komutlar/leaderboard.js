@@ -11,7 +11,7 @@ Font.loadDefault();
 module.exports = {
   name: "leaderboard",
   description: "En fazla SGAT Cash sahipleri",
-  options: [],
+  isAdmin: false,
   /**
    * @param {Client} client
    * @param {Message} message

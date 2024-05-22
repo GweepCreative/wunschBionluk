@@ -6,6 +6,7 @@ const { upLevel } = require("../utils/xpCal");
 module.exports = {
   name: "dilen",
   description: "Para iste",
+  isAdmin: false,
 
   /**
    * @param {Client} client
