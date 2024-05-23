@@ -11,6 +11,7 @@ const { User } = require("../utils/schemas");
 module.exports = {
   name: "blackjack",
   description: "Blackjack oyunu başlatır",
+  isAdmin: false,
   /**
    * @param {Client} client
    * @param {Message} message

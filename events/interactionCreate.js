@@ -18,10 +18,7 @@ const ms = require("ms");
  */
 module.exports = async (client, interaction) => {
   if (interaction.member.user.id !== global.botOwner) {
-    if (
-      interaction.channelId !== "1155193203146895451" &&
-      interaction.channel.parentId !== "1206363617625251850"
-    )
+    if (!global.cmdChannelId.includes(interaction.channelId))
       return interaction.reply({
         content: "Bu kanalda komut kullanamazsınız.",
         ephemeral: true,
@@ -45,12 +42,14 @@ module.exports = async (client, interaction) => {
       } catch {}
       userData.tasks = null;
       userData.save();
-  
+
       interaction.message.edit({
         components: [
           new ActionRowBuilder().setComponents(
             new ButtonBuilder()
-              .setLabel(`${interaction.member.user.username} tarafından onaylandı`)
+              .setLabel(
+                `${interaction.member.user.username} tarafından onaylandı`
+              )
               .setDisabled(true)
               .setCustomId("reddet")
               .setStyle(ButtonStyle.Success)
@@ -71,13 +70,15 @@ module.exports = async (client, interaction) => {
         });
       } catch {}
       userData.tasks = null;
-      
+
       userData.save();
       interaction.message.edit({
         components: [
           new ActionRowBuilder().setComponents(
             new ButtonBuilder()
-              .setLabel(`${interaction.member.user.username} tarafından reddedildi`)
+              .setLabel(
+                `${interaction.member.user.username} tarafından reddedildi`
+              )
               .setDisabled(true)
               .setCustomId("reddet")
               .setStyle(ButtonStyle.Danger)

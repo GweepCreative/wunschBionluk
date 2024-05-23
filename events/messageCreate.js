@@ -12,7 +12,8 @@ module.exports = (client, message) => {
   const command = message.content.split(" ")[0].slice(prefix.length);
   const args = message.content.split(" ").slice(1);
   const cmd = global.commands.get(command);
-  if(!cmd) return;
+  if (!cmd) return;
+  if (!global.cmdChannelId.includes(message.channelId)) return;
   if (cmd && cmd.isAdmin && !message.member.permissions.has("Administrator"))
     return message.reply("Bu komutu kullanabilmek için yönetici olmalısın!");
   cmd.run(client, message, args);

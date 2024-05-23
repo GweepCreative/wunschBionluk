@@ -40,7 +40,7 @@ module.exports = {
     }
     userData.tasks.isActive = false;
     userData.save();
-    message.guild.channels.cache.get("1241853620710932600").send({
+    message.guild.channels.cache.get(global.taskChannel).send({
       embeds: [
         new EmbedBuilder()
           .setTitle("Görev Sonlandırıldı")
@@ -103,7 +103,7 @@ module.exports = {
             `Görev başarıyla sonlandırıldı! Lütfen yetkililerin onaylamasını bekleyiniz\n**Görev ID: **\`${
               userData.tasks.taskId
             }\`\n**Ödül: **\`${userData.tasks.prize} Cash\`\n**Süre: **\`${ms(
-              Number(userData.tasks.deadline - userData.tasks.createdAt),
+              Number(userData.tasks.deadline - userData.tasks.createdAtw),
               {
                 long: true,
               }

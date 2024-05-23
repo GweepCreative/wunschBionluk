@@ -18,6 +18,9 @@ const { isDev, prod, dev, mongoDB } = require("./ayarlar.json");
 const token = isDev ? dev.token : prod.token;
 global.isDev = isDev;
 global.botOwner = isDev ? dev.botOwner : prod.botOwner;
+global.cmdChannelId = isDev ? dev.cmdChannel : prod.cmdChannel;
+global.taskChannel = isDev ? dev.taskChannel : prod.taskChannel;
+
 const mongoose = require("mongoose");
 mongoose
   .connect(mongoDB)

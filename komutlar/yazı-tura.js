@@ -14,7 +14,7 @@ module.exports = {
     if (!args[0] || !args[1] || isNaN(args[0]) || !isNaN(args[1]))
       return message.reply({
         content:
-          "Doğru kullanım !yazı-tura <bet> <seçim>\nörek: `!yazı-tura 500 yazı` ",
+          "Doğru kullanım !yazı-tura <bet> <seçim>\nörnek: `!yazı-tura 500 yazı` ",
           ephemeral: true,
       });
 
