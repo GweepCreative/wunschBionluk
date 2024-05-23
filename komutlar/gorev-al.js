@@ -3,16 +3,20 @@ const { Message, Client, EmbedBuilder } = require("discord.js");
 const ms = require("ms");
 const useId = require("../utils/useId");
 const { User } = require("../utils/schemas");
+const prettyMilliseconds = require("pretty-ms");
+const formatTime = require("../utils/formatTime");
 module.exports = {
-  name: "görev-al",
+  name: "göreval",
   description: "Rastgele görev verir",
-  isAdmin: true,
+  isAdmin: false,
   /**
    * @param {Client} client
    * @param {Message} message
    * @param {String[]} args
    */
   run: async (client, message, args) => {
+    if (message.channelId !== global.taskChannel) return;
+
     const tasks = await Task.find();
     const task = tasks[Math.floor(Math.random() * tasks.length)];
     const userData = await User.findOne({ id: message.author.id });
@@ -27,9 +31,9 @@ module.exports = {
     if (userData.cooldowns.task > Date.now())
       return message.reply({
         embeds: [
-          embed.setDescription(
+          new EmbedBuilder().setTitle("Lütfen Bekleyin").setDescription(
             `⌛ Zaten yakın zamanda görev aldınız, lütfen yeni görev almak için **\`${prettyMilliseconds(
-              userData.cooldowns.daily - Date.now(),
+              userData.cooldowns.task - Date.now(),
               { verbose: true, secondsDecimalDigits: 0 }
             )
               .replace("hours", "saat")
@@ -52,16 +56,21 @@ module.exports = {
       embeds: [
         new EmbedBuilder()
           .setTitle("Görev Alındı")
-          .setDescription(
-            `Görev başarıyla alındı!\n**Görev ID: **\`${
-              task.id
-            }\`\n**Ödül: **\`${task.prize} Cash\`\n**Süre: **\`${ms(
-              Number(task.deadline),
-              {
-                long: true,
-              }
-            )}\`\n**Başlık: **\`${task.title}\``
-          )
+          .setFields([
+            { name: `Göreviniz`, value: `${task.title}`, inline: false },
+            { name: `Ödül`, value: `${task.prize} Cash`, inline: false },
+            {
+              name: `Süre`,
+              value: `${formatTime(
+                ms(Number(task.deadline), {
+                  long: false,
+                })
+              )}`,
+              inline: false,
+            },
+            { name: `Görev ID`, value: `${task.id}`, inline: false },
+          ])
+
           .setColor("Green"),
       ],
     });

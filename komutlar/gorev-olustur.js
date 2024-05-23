@@ -2,8 +2,9 @@ const Task = require("../utils/task");
 const { Message, Client, EmbedBuilder } = require("discord.js");
 const ms = require("ms");
 const useId = require("../utils/useId");
+const formatTime = require("../utils/formatTime");
 module.exports = {
-  name: "görev-oluştur",
+  name: "görevoluştur",
   description: "Görev Oluşturur",
   isAdmin: true,
   /**
@@ -32,7 +33,7 @@ module.exports = {
         new EmbedBuilder()
           .setTitle("Görev Oluşturuldu")
           .setDescription(
-            `Görev başarıyla oluşturuldu!\n**Görev ID: **\`${taskId}\`\n**Ödül: **\`${prize} Cash\`\n**Süre: **\`${deadline}\`\n**Başlık: **\`${title}\``
+            `Görev başarıyla oluşturuldu!\n**Görev ID: **\`${taskId}\`\n**Ödül: **\`${prize} Cash\`\n**Süre: **\`${formatTime(deadline)}\`\n**Başlık: **\`${title}\``
           )
           .setColor("Green"),
       ],

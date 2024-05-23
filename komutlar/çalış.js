@@ -62,7 +62,7 @@ module.exports = {
     userData.xpPoint += amount * 10;
     userData.xp = userxp;
     userData.wallet += amount;
-    if (message.member.user.id !== botOwner)
+    if (message.member.user.id !== global.botOwner)
       userData.cooldowns.work = Date.now() + 1000 * 60 * 60 * 3; // 3 saat
     userData.save();
 

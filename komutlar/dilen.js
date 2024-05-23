@@ -36,7 +36,7 @@ module.exports = {
     const amount = Math.floor(
       (Math.round(10 / (Math.random() * 10 + 1)) * 5) / 2
     );
-    if (message.member.user.id !== botOwner)
+    if (message.member.user.id !== global.botOwner)
       userData.cooldowns.beg = Date.now() + 1000 * 60 * 60 * 3; // 3 saat
     if (amount <= 5) {
       userData.save();

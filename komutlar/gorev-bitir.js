@@ -10,8 +10,9 @@ const {
 const ms = require("ms");
 const useId = require("../utils/useId");
 const { User } = require("../utils/schemas");
+const formatTime = require("../utils/formatTime");
 module.exports = {
-  name: "görev-bitir",
+  name: "görevbitir",
   description: "Aktif görevinizi sonlandırır",
   isAdmin: false,
   /**
@@ -40,7 +41,7 @@ module.exports = {
     }
     userData.tasks.isActive = false;
     userData.save();
-    message.guild.channels.cache.get(global.taskChannel).send({
+    message.guild.channels.cache.get(global.modTaskChannel).send({
       embeds: [
         new EmbedBuilder()
           .setTitle("Görev Sonlandırıldı")
@@ -48,6 +49,11 @@ module.exports = {
             `Yeni bir kullanıcı görevini sonlandırdı. Aşağıdaki butonlar ile işlem yapabilirsiniz`
           )
           .setFields([
+            {
+              name: "Kullanıcı",
+              value: `<@${message.author.id}> | \`${message.author.id}\``,
+              inline: true,
+            },
             {
               name: `Görev Adı`,
               value: `${userData.tasks.title}`,
@@ -60,7 +66,13 @@ module.exports = {
             },
             {
               name: `Görev Süresi`,
-              value: `${ms((new Date(userData.tasks.deadline)-new Date(userData.tasks.createdAt)), { long: true })} `,
+              value: `${formatTime(
+                ms(
+                  new Date(userData.tasks.deadline) -
+                    new Date(userData.tasks.createdAt),
+                  { long: false }
+                )
+              )} `,
               inline: true,
             },
             {
@@ -102,12 +114,12 @@ module.exports = {
           .setDescription(
             `Görev başarıyla sonlandırıldı! Lütfen yetkililerin onaylamasını bekleyiniz\n**Görev ID: **\`${
               userData.tasks.taskId
-            }\`\n**Ödül: **\`${userData.tasks.prize} Cash\`\n**Süre: **\`${ms(
-              Number(userData.tasks.deadline - userData.tasks.createdAtw),
+            }\`\n**Ödül: **\`${userData.tasks.prize} Cash\`\n**Süre: **\`${formatTime(ms(
+              Number(userData.tasks.deadline - userData.tasks.createdAt),
               {
-                long: true,
+                long: false,
               }
-            )}\`\n**Başlık: **\`${userData.tasks.title}\``
+            ))}\`\n**Başlık: **\`${userData.tasks.title}\``
           )
           .setColor("Green"),
       ],

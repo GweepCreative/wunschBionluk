@@ -29,7 +29,10 @@ module.exports = async (client, interaction) => {
       const userId = interaction.customId.split("_")[1];
       const userData = await User.findOne({ id: userId });
       userData.wallet += userData.tasks.prize;
-      userData.cooldowns.task = Date.now() + 1000 * 60 * 60 * 12; // 12 saat
+
+      if (userId !== global.botOwner)
+        userData.cooldowns.task = Date.now() + 1000 * 60 * 60 * 12; // 12 saat
+
       userData.complatedTasks.push({
         taskId: userData.tasks.taskId,
         prize: userData.tasks.prize,

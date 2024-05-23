@@ -42,7 +42,7 @@ module.exports = {
         ],
         ephemeral: true,
       });
-    if (message.member.user.id !== botOwner) {
+    if (message.member.user.id !== global.botOwner) {
       userData.cooldowns.yazitura = Date.now() + 1000 * 60 * 7;
       userData.save();
     }

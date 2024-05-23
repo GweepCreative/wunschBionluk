@@ -20,6 +20,7 @@ global.isDev = isDev;
 global.botOwner = isDev ? dev.botOwner : prod.botOwner;
 global.cmdChannelId = isDev ? dev.cmdChannel : prod.cmdChannel;
 global.taskChannel = isDev ? dev.taskChannel : prod.taskChannel;
+global.modTaskChannel = isDev ? dev.modTaskChannel : prod.modTaskChannel;
 
 const mongoose = require("mongoose");
 mongoose

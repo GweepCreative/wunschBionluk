@@ -3,7 +3,7 @@ const { Message, Client, EmbedBuilder } = require("discord.js");
 const ms = require("ms");
 const useId = require("../utils/useId");
 module.exports = {
-  name: "görev-sil",
+  name: "görevsil",
   description: "Görev siler",
   isAdmin: true,
   /**
