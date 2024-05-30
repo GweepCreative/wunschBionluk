@@ -14,14 +14,16 @@ module.exports = {
       !args[1] ||
       args[0].length < 17 ||
       isNaN(args[0].replace(/[<>@!]/g, "")) ||
-      isNaN(args[1])
+      isNaN(args[1]) ||
+      Number(args[1]) < 1 ||
+      Number(args[1]) > 10_000
     )
       return message.reply(
         "Hata kullanım lütfen geçerli bilgiler giriniz.\nDoğru kullanım: !paragönder @user miktar"
       );
     let userId = args[0].replace(/[<>@!]/g, ""); //interaction.options.getUser("kullanıcı").id;
     let author = message.member.user.id;
-    let amount = args[1]; //interaction.options.get("miktar").value;
+    let amount = Number(args[1]); //interaction.options.get("miktar").value;
     let komisyon = Math.ceil((amount * 10) / 100);
     let total = amount - komisyon;
     if (!client.users.fetch(userId))

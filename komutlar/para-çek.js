@@ -15,7 +15,8 @@ module.exports = {
       (await User.findOne({ id: user.id })) || new User({ id: user.id })),
       (embed = new EmbedBuilder().setColor("Yellow"));
 
-    if (userData.bank < amount)
+      if(!amount || isNaN(amount) || Number(amount)<1) return message.reply({content: "Lütfen geçerli bir miktar belirtin", ephemeral: true});
+    if (userData.bank < Number(amount))
       return message.reply({
         embeds: [
           embed.setDescription(
@@ -27,8 +28,8 @@ module.exports = {
         ephemeral: true,
       });
 
-    userData.bank -= amount;
-    userData.wallet += amount;
+    userData.bank -= Number(amount);
+    userData.wallet += Number(amount);
     userData.save();
 
     return message.reply({
