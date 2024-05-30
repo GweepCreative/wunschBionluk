@@ -1,23 +1,19 @@
-const {
-  Client,
-  Message,
-  EmbedBuilder,
-} = require("discord.js");
+const { Client, Message, EmbedBuilder } = require("discord.js");
 const { User } = require("../utils/schemas");
 module.exports = {
-  name: "para-çek",
+  name: "paraçek",
   description: "Bankanızdan para çekin",
   /**
    * @param {Client} client
    * @param {Message} message
    * @param {String[]} args
    */
-  run: async (client, message) => {
+  run: async (client, message, args) => {
     const user = message.member.user,
       amount = args[0]; //message.options.get("miktar").value
     (userData =
       (await User.findOne({ id: user.id })) || new User({ id: user.id })),
-      (embed = new EmbedBuilder({ color: "Yellow" }));
+      (embed = new EmbedBuilder().setColor("Yellow"));
 
     if (userData.bank < amount)
       return message.reply({

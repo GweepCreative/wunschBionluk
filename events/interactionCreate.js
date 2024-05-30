@@ -41,9 +41,18 @@ module.exports = async (client, interaction) => {
       try {
         client.users.cache.get(userId).send({
           content: `\`${userData.tasks.title}\` Göreviniz başarıyla onaylandı. Ödül olarak **${userData.tasks.prize}** Cash kazandınız`,
-        });
+        }).catch(()=>{});
       } catch {}
-      userData.tasks = null;
+     
+	  let userxp = userData.xp;
+    if ((userxp < 21) && (userData.xpPoint + userData.tasks.prize * 10) / 20000 >= 1) {
+      userxp += 1;
+      userData.xpPoint = 0;
+      userData.gerekli = 20000;
+
+      await upLevel(interaction, user.id, userxp);
+    }
+	 userData.tasks = null;
       userData.save();
 
       interaction.message.edit({
@@ -70,7 +79,7 @@ module.exports = async (client, interaction) => {
       try {
         client.users.cache.get(userId).send({
           content: `\`${userData.tasks.title}\` Göreviniz reddedildi`,
-        });
+        }).catch(()=>{});
       } catch {}
       userData.tasks = null;
 

@@ -1,4 +1,10 @@
-const { MessageEmbed, Client, CommandInteraction, Message, EmbedBuilder } = require("discord.js");
+const {
+  MessageEmbed,
+  Client,
+  CommandInteraction,
+  Message,
+  EmbedBuilder,
+} = require("discord.js");
 const { User } = require("../utils/schemas");
 const prettyMilliseconds = require("pretty-ms");
 const { botOwner } = require("../ayarlar.json");
@@ -52,7 +58,7 @@ module.exports = {
     const job = jobs[Math.floor(Math.random() * jobs.length)];
 
     let userxp = userData.xp;
-    if ((userxp < 11) && (userData.xpPoint + amount * 10) / 20000 >= 1) {
+    if (userxp < 11 && (userData.xpPoint + amount * 10) / 20000 >= 1) {
       userxp += 1;
       userData.xpPoint = 0;
       userData.gerekli = 20000;
@@ -68,7 +74,7 @@ module.exports = {
 
     const workEmbed = new EmbedBuilder()
       .setDescription(
-        `**\` ${job} \`** olarak çalıştınız ve \` ${amount} \` SGAT Cash kazandınız 🪙`
+        `**\` ${job} \`** olarak çalıştınız ve \` ${amount} \` SGTK Cash kazandınız 🪙`
       )
       .setColor("Yellow");
 

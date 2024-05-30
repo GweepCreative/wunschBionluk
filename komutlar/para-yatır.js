@@ -1,7 +1,7 @@
 const { Client, Message, EmbedBuilder } = require("discord.js");
 const { User } = require("../utils/schemas");
 module.exports = {
-  name: "para-yatır",
+  name: "parayatır",
   description: "Cüzdanınızdaki paranızı bankaya yatırın",
   /**
    * @param {Client} client
@@ -16,10 +16,10 @@ module.exports = {
         content: "Lütfen geçerli bir miktar belirtin",
         ephemeral: true,
       });
-      
+
     const userData =
         (await User.findOne({ id: user.id })) || new User({ id: user.id }),
-      embed = new EmbedBuilder({ color: "Yellow" });
+      embed = new EmbedBuilder().setColor("Yellow");
 
     if (userData.wallet < amount)
       return message.reply({

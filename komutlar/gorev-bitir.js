@@ -25,7 +25,7 @@ module.exports = {
     if (!userData.tasks?.isActive)
       return message.reply("Aktif bir göreviniz yok");
     //Deadline check
-    if (userData.tasks.deadline < Date.now()) {
+    if (userData.tasks.createdAt + userData.tasks.deadline < Date.now()) {
       userData.tasks = null;
       userData.save();
       return message.reply({
@@ -114,12 +114,13 @@ module.exports = {
           .setDescription(
             `Görev başarıyla sonlandırıldı! Lütfen yetkililerin onaylamasını bekleyiniz\n**Görev ID: **\`${
               userData.tasks.taskId
-            }\`\n**Ödül: **\`${userData.tasks.prize} Cash\`\n**Süre: **\`${formatTime(ms(
-              Number(userData.tasks.deadline - userData.tasks.createdAt),
-              {
+            }\`\n**Ödül: **\`${
+              userData.tasks.prize
+            } Cash\`\n**Süre: **\`${formatTime(
+              ms(Number(userData.tasks.deadline - userData.tasks.createdAt), {
                 long: false,
-              }
-            ))}\`\n**Başlık: **\`${userData.tasks.title}\``
+              })
+            )}\`\n**Başlık: **\`${userData.tasks.title}\``
           )
           .setColor("Green"),
       ],

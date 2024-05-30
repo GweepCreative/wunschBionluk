@@ -1,4 +1,9 @@
-const { EmbedBuilder, Client, CommandInteraction, Message } = require("discord.js");
+const {
+  EmbedBuilder,
+  Client,
+  CommandInteraction,
+  Message,
+} = require("discord.js");
 const { User } = require("../utils/schemas");
 const prettyMilliseconds = require("pretty-ms");
 const { upLevel } = require("../utils/xpCal");
@@ -14,7 +19,7 @@ module.exports = {
     const user = message.member.user;
     const userData =
       (await User.findOne({ id: user.id })) || new User({ id: user.id });
-    const embed = new EmbedBuilder({ color: "Yellow" });
+    const embed = new EmbedBuilder().setColor("Yellow");
 
     if (userData.cooldowns.daily > Date.now())
       return message.reply({
@@ -33,7 +38,7 @@ module.exports = {
       });
 
     let userxp = userData.xp;
-    if ((userxp < 11) && (userData.xpPoint + 50) / 20000 >= 1) {
+    if (userxp < 21 && (userData.xpPoint + 50) / 20000 >= 1) {
       userxp += 1;
       userData.xpPoint = 0;
       userData.gerekli = 20000;

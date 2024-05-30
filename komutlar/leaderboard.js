@@ -1,7 +1,8 @@
 const {
   Client,
   CommandInteraction,
-  MessageAttachment,
+  // MessageAttachment,
+  AttachmentBuilder,
   Message,
 } = require("discord.js");
 const { LeaderboardBuilder, Font } = require("canvacord");
@@ -10,7 +11,7 @@ Font.loadDefault();
 
 module.exports = {
   name: "leaderboard",
-  description: "En fazla SGAT Cash sahipleri",
+  description: "En fazla SGTK Cash sahipleri",
   isAdmin: false,
   /**
    * @param {Client} client
@@ -27,10 +28,12 @@ module.exports = {
       if (client.users.cache.has(user.id))
         players.push({
           avatar:
-            client.users.cache
-              .get(user.id)
-              .avatarURL({ dynamic: false, size: 512, format: "png" }) ||
-            "https://cdn.discordapp.com/embed/avatars/0.png",
+            client.users.cache.get(user.id).displayAvatarURL({
+              forceStatic: true,
+              dynamic: false,
+              size: 512,
+              extension: "jpg",
+            }) || "https://cdn.discordapp.com/embed/avatars/0.png",
           displayName: client.users.cache.get(user.id).displayName,
           rank: i + 1,
           level: user.xp,
@@ -43,8 +46,12 @@ module.exports = {
     const leaderboard = new LeaderboardBuilder()
       .setHeader({
         title: "Sanalika",
-        subtitle: "TOP 10 SGAT Cash",
-        image: interaction.guild.iconURL({ dynamic: false }),
+        subtitle: "TOP 10 SGTK Cash",
+        image: message.guild.iconURL({
+          forceStatic: true,
+          extension: "jpg",
+          dynamic: false,
+        }),
       })
       .setPlayers(players)
 
@@ -52,7 +59,7 @@ module.exports = {
       .setBackground("https://i.hizliresim.com/a7ykk13.png")
       .setTextStyles({ xp: "Cash" });
     await leaderboard.build({ format: "png" }).then((data) => {
-      const dosya = new MessageAttachment(data, "liderlik.png");
+      const dosya = new AttachmentBuilder(data, { name: "leaderboard.png" });
       msg.edit({ content: "\u200B", files: [dosya] });
     });
   },

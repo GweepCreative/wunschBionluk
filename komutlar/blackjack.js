@@ -21,6 +21,8 @@ module.exports = {
   run: async (client, message, args) => {
     if (!args[0] || isNaN(args[0]))
       return message.reply("Lütfen bir miktar belirtin.");
+    if (Number(args[0] < 1))
+      return message.reply("Lütfen geçerli bir miktar belirtin.");
     const userData =
       (await User.findOne({ id: message.member.user.id })) ||
       new User({ id: message.member.user.id });
@@ -28,7 +30,7 @@ module.exports = {
     if (userData.cooldowns.blackjack > Date.now())
       return message.reply({
         embeds: [
-          new MessageEmbed().setColor("Yellow").setDescription(
+          new EmbedBuilder().setColor("Yellow").setDescription(
             `⌛ **\`${prettyMilliseconds(
               userData.cooldowns.blackjack - Date.now(),
               {
@@ -47,10 +49,13 @@ module.exports = {
       });
     if (message.member.user.id !== global.botOwner) {
       //await User.updateOne({id:interaction.member.user.id},{$inc:{cooldowns:{blackjack:Date.now() + 1000 * 60 * 15}}},{upsert:true})
-      userData.cooldowns.blackjack = Date.now() + 1000 * 60 * 7;
+      userData.cooldowns.blackjack = Date.now() + 1000 * 60 * 3;
       userData.save();
     }
-    const bet = args[0] || 100;
+    const bet = Number(args[0]) > 50 ? 50 : Number(args[0]);
+    if (bet < 1) return message.reply("Lütfen geçerli bir miktar belirtin.");
+    if (userData.wallet < bet)
+      return message.reply("Cüzdanında yeterli miktar bulunmamaktadır.");
     let game = await blackjack(message);
 
     switch (game.result) {
@@ -67,7 +72,7 @@ module.exports = {
               .setDescription(
                 `Bu oyundan **${
                   bet * 2
-                } SGAT Cash** ve **${point}** puan kazandın!`
+                } SGTK Cash** ve **${point}** puan kazandın!`
               ),
           ],
         });

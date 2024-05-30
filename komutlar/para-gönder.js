@@ -1,11 +1,7 @@
-const {
-  Client,
-  Message,
-  EmbedBuilder,
-} = require("discord.js");
+const { Client, Message, EmbedBuilder } = require("discord.js");
 const { User } = require("../utils/schemas");
 module.exports = {
-  name: "para-gönder",
+  name: "paragönder",
   description: "Kullanıcıya Para Gönderir (%20 Komisyon keser)",
   /**
    * @param {Client} client
@@ -13,7 +9,17 @@ module.exports = {
    * @param {String[]} args
    */
   run: async (client, message, args) => {
-    let userId = args[0]; //interaction.options.getUser("kullanıcı").id;
+    if (
+      !args[0] ||
+      !args[1] ||
+      args[0].length < 17 ||
+      isNaN(args[0].replace(/[<>@!]/g, "")) ||
+      isNaN(args[1])
+    )
+      return message.reply(
+        "Hata kullanım lütfen geçerli bilgiler giriniz.\nDoğru kullanım: !paragönder @user miktar"
+      );
+    let userId = args[0].replace(/[<>@!]/g, ""); //interaction.options.getUser("kullanıcı").id;
     let author = message.member.user.id;
     let amount = args[1]; //interaction.options.get("miktar").value;
     let komisyon = Math.ceil((amount * 10) / 100);
@@ -24,7 +30,7 @@ module.exports = {
           { title: "Sistemde böyle bir kullanıcı bulamıyorum", color: "RED" },
         ],
       });
-    const embed = new EmbedBuilder({ color: "Yellow" });
+    const embed = new EmbedBuilder().setColor("Yellow");
     const userData =
       (await User.findOne({ id: author })) || new User({ id: author });
 
@@ -46,7 +52,7 @@ module.exports = {
     return message.reply({
       embeds: [
         embed.setDescription(
-          `✅ Kullanıcı hesabınıza \` ${total} \` 🪙 tutar SGAT Cash eklendi. Hesabınızdan kesilen miktar \` ${amount} \``
+          `✅ Kullanıcı hesabınıza \` ${total} \` 🪙 tutar SGTK Cash eklendi. Hesabınızdan kesilen miktar \` ${amount} \``
         ),
       ],
     });

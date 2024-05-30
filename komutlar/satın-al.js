@@ -2,7 +2,7 @@ const { User } = require("../utils/schemas");
 const shop = require("../utils/shop");
 const { Client, Message } = require("discord.js");
 module.exports = {
-  name: "satın-al",
+  name: "satınal",
   description: "Belirtilen Ürünü Satın Alırsınız",
   /**
    * @param {Client} client

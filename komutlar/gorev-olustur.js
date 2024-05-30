@@ -33,7 +33,9 @@ module.exports = {
         new EmbedBuilder()
           .setTitle("Görev Oluşturuldu")
           .setDescription(
-            `Görev başarıyla oluşturuldu!\n**Görev ID: **\`${taskId}\`\n**Ödül: **\`${prize} Cash\`\n**Süre: **\`${formatTime(deadline)}\`\n**Başlık: **\`${title}\``
+            `Görev başarıyla oluşturuldu!\n**Görev ID: **\`${taskId}\`\n**Ödül: **\`${prize} Cash\`\n**Süre: **\`${formatTime(
+              deadline
+            )}\`\n**Başlık: **\`${title}\``
           )
           .setColor("Green"),
       ],

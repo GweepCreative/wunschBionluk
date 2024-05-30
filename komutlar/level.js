@@ -31,11 +31,15 @@ module.exports = {
     let subCmd = args[0];
     switch (subCmd) {
       case "ayarla": {
-        if (interaction.member.user.id != botOwner) {
-          interaction.reply({
+        if (!args[1])
+          return message.reply(
+            "Lütfen bir seviye belirtiniz\nDoğru kullanım: !level ayarla <seviye> @user"
+          );
+        if (message.member.user.id != botOwner) {
+          message.reply({
             ephemeral: true,
             embeds: [
-              new MessageEmbed()
+              new EmbedBuilder()
                 .setDescription(
                   "Bu komutu kullanmak için Bot Yöneticisi olman gerekiyor"
                 )
@@ -44,17 +48,21 @@ module.exports = {
           });
           return;
         }
-        let member = interaction.options.getMember("kullanıcı");
-        let yenilevel = interaction.options.getInteger("seviye");
+        const member = args[2]
+          ? message.guild.members.cache.get(args[1].replace(/[<>@!]/g, ""))
+          : message.member;
+        if (isNaN(Number(args[2])))
+          return message.reply("Lütfen geçerli bir seviye belirtiniz");
+        let yenilevel = Number(args[1]);
         await User.updateOne(
           { id: member.id },
           { xp: yenilevel },
           { upsert: true }
         );
-        interaction.reply({
+        message.reply({
           embeds: [
-            new MessageEmbed()
-              .setColor("GREEN")
+            new EmbedBuilder()
+              .setColor("Green")
               .setTitle("Seviye Ayarlandı")
               .setDescription(
                 `${member} adlı kullanıcının seviyesi ${yenilevel} olarak ayarlandı.`
@@ -77,8 +85,9 @@ module.exports = {
           });
           return;
         }
-        const member =
-          message.guild.members.cache.get(args[1]) || message.member;
+        const member = args[1]
+          ? message.guild.members.cache.get(args[1].replace(/[<>@!]/g, ""))
+          : message.member;
         await User.updateOne(
           { id: member.user.id },
           { $set: { xp: 0, xpPoint: 0, gerekli: 20000 } },
@@ -101,8 +110,9 @@ module.exports = {
           content: "Hazırlanıyor",
           ephemeral: true,
         });
-        const member =
-          message.guild.members.cache.get(args[1].replace(/[<>@!]/g,"")) || message.member;
+        const member = args[1]
+          ? message.guild.members.cache.get(args[1].replace(/[<>@!]/g, ""))
+          : message.member;
         try {
           let x =
             (await User.findOne({ id: member.id })) ||

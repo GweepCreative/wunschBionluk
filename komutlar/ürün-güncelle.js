@@ -7,7 +7,7 @@ const {
 const Shop = require("../utils/shop");
 const { botOwner } = require("../ayarlar.json");
 module.exports = {
-  name: "ürün-güncelle",
+  name: "ürüngüncelle",
   description: "Sisteme ürün günellersiniz",
   /**
    * @param {Client} client

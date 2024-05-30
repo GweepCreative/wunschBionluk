@@ -1,10 +1,16 @@
-const { MessageEmbed, Client, CommandInteraction, Message, EmbedBuilder } = require("discord.js");
+const {
+  MessageEmbed,
+  Client,
+  CommandInteraction,
+  Message,
+  EmbedBuilder,
+} = require("discord.js");
 const { User } = require("../utils/schemas");
 const prettyMilliseconds = require("pretty-ms");
 const { upLevel } = require("../utils/xpCal");
 const { botOwner } = require("../ayarlar.json");
-module.exports = { 
-  name: "cash",      
+module.exports = {
+  name: "cash",
   description: "Rastgele miktarda para kazan",
   isAdmin: false,
 
@@ -12,8 +18,7 @@ module.exports = {
    * @param {Client} client
    * @param {Message} message
    */
-  run: async (client, message) => { 
-
+  run: async (client, message) => {
     const user = message.member.user;
     const userData =
       (await User.findOne({ id: user.id })) || new User({ id: user.id });
@@ -25,7 +30,7 @@ module.exports = {
             `⌛ **\`${prettyMilliseconds(userData.cooldowns.cash - Date.now(), {
               verbose: true,
               secondDecimalDigits: 0,
-            }) 
+            })
               .replace("minutes", "dakika")
               .replace(
                 "seconds",
@@ -35,8 +40,8 @@ module.exports = {
         ],
         ephemeral: true,
       });
-    const amount = uretSeviyeyeGore(userxp) || 3;
-    if ((userxp < 11) && (userData.xpPoint + amount * 10) / 20000 >= 1) {
+    const amount = uretSeviyeyeGore(userxp) || 6;
+    if (userxp < 21 && (userData.xpPoint + amount * 10) / 20000 >= 1) {
       userxp += 1;
       userData.xpPoint = userData.xpPoint - 20000;
       userData.gerekli = 20000;
@@ -44,7 +49,7 @@ module.exports = {
       await upLevel(message, user.id, userxp);
     }
 
-    userData.xpPoint += amount * 10; 
+    userData.xpPoint += amount * 10;
     userData.xp = userxp;
     userData.wallet += amount;
     if (message.member.user.id !== global.botOwner)
@@ -52,16 +57,16 @@ module.exports = {
     userData.save();
 
     const workEmbed = new EmbedBuilder()
-      .setDescription(`\` ${amount} \` SGAT Cash kazandınız 🪙`)
-      .setColor("Yellow");    
- 
+      .setDescription(`\` ${amount} \` SGTK Cash kazandınız 🪙`)
+      .setColor("Yellow");
+
     return await message.reply({ embeds: [workEmbed] });
   },
 };
 function uretSeviyeyeGore(seviye) {
-  if (seviye < 5) {
-    return Math.floor(Math.random() * 5);
+  if (seviye < 10) {
+    return Math.floor(Math.random() * 10);
   } else {
-    return Math.floor(Math.random() * 2);
+    return Math.floor(Math.random() * 4);
   }
 }

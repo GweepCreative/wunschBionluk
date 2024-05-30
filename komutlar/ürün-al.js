@@ -8,7 +8,7 @@ const Shop = require("../utils/shop");
 const { botOwner } = require("../ayarlar.json");
 const { User } = require("../utils/schemas");
 module.exports = {
-  name: "ürün-al",
+  name: "ürünal",
   description: "Kullanıcının ürününü alır",
   /**
    * @param {Client} client
@@ -27,7 +27,8 @@ module.exports = {
     const miktar = args[2]; //interaction.options.getInteger("miktar");
     if (isNaN(user) || isNaN(urun) || isNaN(miktar))
       return message.reply({
-        content: "Komutu hatalı kullandınız. \n Doğru kullanım `!ürün-al <kullanıcı-Id> <ürün-kodu> <miktar>`",
+        content:
+          "Komutu hatalı kullandınız. \n Doğru kullanım `!ürün-al <kullanıcı-Id> <ürün-kodu> <miktar>`",
         ephemeral: true,
       });
     if (miktar <= 0) {

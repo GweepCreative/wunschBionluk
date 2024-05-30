@@ -3,7 +3,7 @@ const { User } = require("../utils/schemas");
 const prettyMilliseconds = require("pretty-ms");
 const { botOwner } = require("../ayarlar.json");
 module.exports = {
-  name: "yazı-tura",
+  name: "yazıtura",
   description: "Yazı-Tura oyunu başlatır",
 
   /**
@@ -15,7 +15,7 @@ module.exports = {
       return message.reply({
         content:
           "Doğru kullanım !yazı-tura <bet> <seçim>\nörnek: `!yazı-tura 500 yazı` ",
-          ephemeral: true,
+        ephemeral: true,
       });
 
     const userData =
@@ -43,13 +43,15 @@ module.exports = {
         ephemeral: true,
       });
     if (message.member.user.id !== global.botOwner) {
-      userData.cooldowns.yazitura = Date.now() + 1000 * 60 * 7;
+      userData.cooldowns.yazitura = Date.now() + 1000 * 60 * 3;
       userData.save();
     }
 
-    const bet = args[0]; //interaction.options.getInteger("bahis");
+    const bet = Number(args[0]); //interaction.options.getInteger("bahis");
     const choice = String(args[1]).toUpperCase(); //interaction.options.get("seçim").value;
-
+    if (bet > 50) bet = 50;
+    if (bet > userData.wallet) return message.reply("Yeterli bakiyeniz yok");
+    if (bet < 1) bet = 1;
     const msg = await message.reply({
       embeds: [
         new EmbedBuilder()
@@ -83,7 +85,7 @@ module.exports = {
               }
               Bu oyundan **${
                 bet * 2
-              } SGAT Cash** ve **${point}** puan kazandın!`
+              } SGTK Cash** ve **${point}** puan kazandın!`
             ),
         ],
       });
