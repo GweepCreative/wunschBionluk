@@ -31,7 +31,7 @@ module.exports = async (client, interaction) => {
       userData.wallet += userData.tasks.prize;
 
       if (userId !== global.botOwner)
-        userData.cooldowns.task = Date.now() + 1000 * 60 * 60 * 12; // 12 saat
+        userData.cooldowns.task = Date.now() + 1000 * 60 * 60 * 6; // 6 saat
 
       userData.complatedTasks.push({
         taskId: userData.tasks.taskId,
@@ -50,7 +50,7 @@ module.exports = async (client, interaction) => {
       userData.xpPoint = 0;
       userData.gerekli = 20000;
 
-      await upLevel(interaction, user.id, userxp);
+      await upLevel(interaction, userId, userxp);
     }
 	 userData.tasks = null;
       userData.save();
