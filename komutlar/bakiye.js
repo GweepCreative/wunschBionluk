@@ -16,9 +16,9 @@ module.exports = {
    * @param {String[]} args
    */
   run: async (client, message, args) => {
-    let user = args[0]
-      ? (await message.guild.members.fetch(args[0].replace(/[<>@!]/g, ""))).user
-      : message.member.user;
+	  
+    let user =
+      args[0] ? (await message.guild.members.fetch(args[0].replace(/[<>@!]/g,""))).user : message.member.user;
 
     if (message.member.user.id !== global.botOwner) {
       user = message.member.user;

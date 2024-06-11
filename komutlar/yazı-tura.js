@@ -47,9 +47,9 @@ module.exports = {
       userData.save();
     }
 
-    const bet = Number(args[0]); //interaction.options.getInteger("bahis");
+    let bet = Number(args[0]); //interaction.options.getInteger("bahis");
     const choice = String(args[1]).toUpperCase(); //interaction.options.get("seçim").value;
-    if (bet > 50) bet = 50;
+    if (bet > 100) bet = 100;
     if (bet > userData.wallet) return message.reply("Yeterli bakiyeniz yok");
     if (bet < 1) bet = 1;
     const msg = await message.reply({

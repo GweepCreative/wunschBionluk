@@ -1,9 +1,4 @@
-const {
-  EmbedBuilder,
-  Client,
-  CommandInteraction,
-  Message,
-} = require("discord.js");
+const { EmbedBuilder, Client, CommandInteraction, Message } = require("discord.js");
 const { User } = require("../utils/schemas");
 const prettyMilliseconds = require("pretty-ms");
 const { botOwner } = require("../ayarlar.json");
@@ -55,7 +50,7 @@ module.exports = {
       });
     }
     let userxp = userData.xp;
-    if (userxp < 21 && (userData.xpPoint + amount * 10) / 20000 >= 1) {
+    if ((userxp < 21) && (userData.xpPoint + amount * 10) / 20000 >= 1) {
       userxp += 1;
       userData.xpPoint = 0;
       userData.gerekli = 20000;

@@ -21,16 +21,17 @@ module.exports = {
         ephemeral: true,
       });
     }
-    const userId = args[0]; // interaction.options.getUser("kullanıcı");
-    const urun = args[1]; //interaction.options.getString("ürün-kodu");
-    const miktar = args[2]; //interaction.options.getInteger("miktar");
+    const userId = args[0] // interaction.options.getUser("kullanıcı");
+    const urun = args[1] //interaction.options.getString("ürün-kodu");
+    const miktar = isNaN(args[2]) ? null : Number(args[2]); //interaction.options.getInteger("miktar");
 
-    if (isNaN(userId) || isNaN(urun) || isNaN(miktar))
+    if (!userId || !urun || !miktar)
       return message.reply({
         content:
           "Komutu hatalı kullandınız. \n Doğru kullanım `!ürün-ver <kullanıcı-Id> <ürün-kodu> <miktar>`",
         ephemeral: true,
       });
+	 
     const user = await client.users.fetch(userId);
     if (miktar <= 0) {
       return message.reply({

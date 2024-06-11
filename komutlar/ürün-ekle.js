@@ -20,14 +20,16 @@ module.exports = {
         ],
         ephemeral: true,
       });
-    let urun = args[0]; // interaction.options.getString("ürün-adı"),
-    ucret = args[1]; //interaction.options.getInteger("ücret"),
-    if (!urun || !ucret)
+	
+    let ucret = isNaN(Number(args[1])) ? null : Number(args[1]); // interaction.options.getString("ürün-adı"),
+    urun = args[0]; //interaction.options.getInteger("ücret"),
+   
+   if (!urun || !ucret)
       return message.reply({
         embeds: [
           {
             title: "Hata",
-            description: "Doğru kullanım: `!ürün-ekle <ürün-adı> <ücret>`",
+            description: "Doğru kullanım: `!ürünekle <ürün-adı> <ücret>`",
           },
         ],
       });

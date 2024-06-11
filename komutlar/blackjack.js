@@ -52,7 +52,7 @@ module.exports = {
       userData.cooldowns.blackjack = Date.now() + 1000 * 60 * 3;
       userData.save();
     }
-    const bet = Number(args[0]) > 50 ? 50 : Number(args[0]);
+    const bet = Number(args[0]) > 100 ? 100 : Number(args[0]);
     if (bet < 1) return message.reply("Lütfen geçerli bir miktar belirtin.");
     if (userData.wallet < bet)
       return message.reply("Cüzdanında yeterli miktar bulunmamaktadır.");

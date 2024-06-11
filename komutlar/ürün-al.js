@@ -22,13 +22,13 @@ module.exports = {
         ephemeral: true,
       });
     }
-    const user = args[0]; // interaction.options.getUser("kullanıcı");
-    const urun = args[1]; //interaction.options.getString("ürün-kodu");
-    const miktar = args[2]; //interaction.options.getInteger("miktar");
-    if (isNaN(user) || isNaN(urun) || isNaN(miktar))
+  const userId = args[0] // interaction.options.getUser("kullanıcı");
+    const urun = args[1] //interaction.options.getString("ürün-kodu");
+    const miktar = isNaN(args[2]) ? null : Number(args[2]); //interaction.options.getInteger("miktar");
+
+    if (!userId || !urun || !miktar)
       return message.reply({
-        content:
-          "Komutu hatalı kullandınız. \n Doğru kullanım `!ürün-al <kullanıcı-Id> <ürün-kodu> <miktar>`",
+        content: "Komutu hatalı kullandınız. \n Doğru kullanım `!ürün-al <kullanıcı-Id> <ürün-kodu> <miktar>`",
         ephemeral: true,
       });
     if (miktar <= 0) {
@@ -37,6 +37,7 @@ module.exports = {
         ephemeral: true,
       });
     }
+	 const user = await client.users.fetch(userId);
     const userData =
       (await User.findOne({ id: user.id })) || new User({ id: user.id });
     const product = await Shop.findOne({ id: urun });

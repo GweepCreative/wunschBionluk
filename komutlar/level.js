@@ -31,10 +31,7 @@ module.exports = {
     let subCmd = args[0];
     switch (subCmd) {
       case "ayarla": {
-        if (!args[1])
-          return message.reply(
-            "Lütfen bir seviye belirtiniz\nDoğru kullanım: !level ayarla <seviye> @user"
-          );
+		  if(!args[1]) return message.reply("Lütfen bir seviye belirtiniz\nDoğru kullanım: !level ayarla <seviye> @user")
         if (message.member.user.id != botOwner) {
           message.reply({
             ephemeral: true,
@@ -48,12 +45,10 @@ module.exports = {
           });
           return;
         }
-        const member = args[2]
-          ? message.guild.members.cache.get(args[1].replace(/[<>@!]/g, ""))
-          : message.member;
-        if (isNaN(Number(args[2])))
-          return message.reply("Lütfen geçerli bir seviye belirtiniz");
-        let yenilevel = Number(args[1]);
+       const member = args[2] ? 
+          message.guild.members.cache.get(args[1].replace(/[<>@!]/g,"")) : message.member;
+       if(isNaN(Number(args[2]))) return message.reply("Lütfen geçerli bir seviye belirtiniz")
+        let yenilevel = Number(args[1])
         await User.updateOne(
           { id: member.id },
           { xp: yenilevel },
@@ -85,9 +80,8 @@ module.exports = {
           });
           return;
         }
-        const member = args[1]
-          ? message.guild.members.cache.get(args[1].replace(/[<>@!]/g, ""))
-          : message.member;
+        const member = args[1] ? 
+          message.guild.members.cache.get(args[1].replace(/[<>@!]/g,"")) : message.member;
         await User.updateOne(
           { id: member.user.id },
           { $set: { xp: 0, xpPoint: 0, gerekli: 20000 } },
@@ -106,13 +100,13 @@ module.exports = {
         break;
       }
       case "bilgi": {
+		 
         const lvlInteraction = await message.reply({
           content: "Hazırlanıyor",
           ephemeral: true,
         });
-        const member = args[1]
-          ? message.guild.members.cache.get(args[1].replace(/[<>@!]/g, ""))
-          : message.member;
+        const member = args[1] ?
+          message.guild.members.cache.get(args[1].replace(/[<>@!]/g,"")) : message.member;
         try {
           let x =
             (await User.findOne({ id: member.id })) ||
