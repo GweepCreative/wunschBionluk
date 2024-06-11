@@ -1,8 +1,4 @@
-const {
-  Client,
-  Message,
-  EmbedBuilder,
-} = require("discord.js");
+const { Client, Message, EmbedBuilder } = require("discord.js");
 const { User } = require("../utils/schemas");
 module.exports = {
   name: "paraver",
@@ -18,17 +14,20 @@ module.exports = {
         content: "Bu komutu kullanmak için yetkili olmazsınız",
         ephemeral: true,
       });
-	if(!args[0] || !args[1]) return message.reply("Hatalı kullanım.\n!para-ver @user <miktar>")
-		
-    let userId = args[0].replace(/[<>@!]/g,""); // interaction.options.getUser("kullanıcı").id;
+    if (!args[0] || !args[1])
+      return message.reply("Hatalı kullanım.\n!para-ver @user <miktar>");
+
+    let userId = args[0].replace(/[<>@!]/g, ""); // interaction.options.getUser("kullanıcı").id;
     let samount = args[1]; //interaction.options.get("miktar").value;
-    if(isNaN(Number(samount))) return message.reply("Lütfen geçerli bir sayı giriniz")
-let amount = Number(samount)
-   if(userId.length < 18) return message.reply("Hatalı kullanım.\n!para-ver @user <miktar>")
-	if (!client.users.fetch(userId))
+    if (isNaN(Number(samount)))
+      return message.reply("Lütfen geçerli bir sayı giriniz");
+    let amount = Number(samount);
+    if (userId.length < 18)
+      return message.reply("Hatalı kullanım.\n!para-ver @user <miktar>");
+    if (!client.users.fetch(userId))
       return message.reply({
         embeds: [
-          { title: "Sistemde böyle bir kullanıcı bulamıyorum", color: "RED" },
+          { title: "Sistemde böyle bir kullanıcı bulamıyorum", color: "Red" },
         ],
       });
     const embed = new EmbedBuilder().setColor("Yellow");

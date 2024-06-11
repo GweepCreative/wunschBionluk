@@ -4,11 +4,60 @@ const {
   CommandInteraction,
   Message,
   EmbedBuilder,
+  AttachmentBuilder,
 } = require("discord.js");
-const cark = require("../utils/cark");
 const { User } = require("../utils/schemas");
+
+// import { parseArgsAsCsv } from '../../utils/commands';
+// import { generateSpinWheel } from './pick/spin-wheel';
+const { generateSpinWheel } = require("../utils/spin-wheel");
+
+const FRAME_DELAY_MS = 50;
+const MAX_DURATION_MS = 5000;
+const LAST_FRAME_DURATION_MS = 1000 / FRAME_DELAY_MS;
+const MIN_ANGLE = 360;
+const MAX_ANGLE = 360 * 8;
+const DURATION = MAX_DURATION_MS / FRAME_DELAY_MS;
+
+const styles = {
+  canvas: {
+    width: 250,
+    height: 250,
+  },
+};
+const carkData = [
+  "PASS",
+  200,
+  200,
+  "PASS",
+  200,
+  300,
+  "PASS",
+  300,
+  300,
+  "PASS",
+  300,
+  "PASS",
+  400,
+  400,
+  "PASS",
+  400,
+  "PASS",
+  400,
+  500,
+  "PASS",
+  600,
+  700,
+  "PASS",
+  800,
+  "PASS",
+  1000,
+  1300,
+  "PASS",
+  1500,
+];
 module.exports = {
-  name: "cark",
+  name: "çark",
   description: "Şanslı Çark",
   /**
    * @param {Client} client
@@ -25,9 +74,18 @@ module.exports = {
       (await User.findOne({ id: message.author.id })) ||
       new User({ id: message.author.id });
     if (userData.wallet < bet) return message.reply("Yeterli paranız yok.");
-    userData.wallet -= bet;
+    if (userData.cooldowns.cark > Date.now())
+      return message.reply(
+        `Bu komutu tekrar kullanabilmek için **${new Date(
+          userData.cooldowns.cark
+        ).toLocaleTimeString()}** tarihine kadar beklemelisin.`
+      );
 
-    const embed = message.reply({
+    userData.wallet -= bet;
+    userData.cooldowns.cark = Date.now() + 1000 * 3;
+    userData.save();
+    const options = carkData;
+    const embed = await message.reply({
       embeds: [
         new EmbedBuilder()
           .setColor("Gold")
@@ -36,79 +94,60 @@ module.exports = {
             text: `${message.author.globalName} tarafından istendi.`,
             iconURL: message.author.avatarURL({ dynamic: true }),
           })
-          .setDescription("<a:slot:1250092657879941201>"),
+          .setDescription("Çark hazırlanıyor <a:slot:1250092657879941201>"),
       ],
     });
-    let status = 0;
-    const carkData = [
-      "PASS",
-      200,
-      200,
-      "PASS",
-      200,
-      300,
-      "PASS",
-      300,
-      300,
-      "PASS",
-      300,
-      "PASS",
-      400,
-      400,
-      "PASS",
-      400,
-      "PASS",
-      400,
-      500,
-      "PASS",
-      600,
-      700,
-      "PASS",
-      800,
-      "PASS",
-      1000,
-      1300,
-      "PASS",
-      1500,
-    ];
-    const result = carkData[Math.floor(Math.random() * carkData.length)];
 
-    setTimeout(() => {
-      embed.then((msg) => {
-        if (result === "PASS") {
-          //LOSE
-          msg.edit({
-            embeds: [
-              new EmbedBuilder()
-                .setColor("Red")
-                .setTitle("Şanslı Çark")
-                .setFooter({
-                  text: `${message.author.globalName} tarafından istendi.`,
-                  iconURL: message.author.avatarURL({ dynamic: true }),
-                })
-                .setDescription(
-                  `Çarkı çevirdin ve **İFLAS** geldi ${bet} para kaybettin!`
-                ),
-            ],
-          });
-        } else {
-          //WIN
-          const prize = result + bet;
-          userData.wallet += prize;
-          msg.edit({
-            embeds: [
-              new EmbedBuilder()
-                .setColor("Green")
-                .setTitle("Şanslı Çark")
-                .setFooter({
-                  text: `${message.author.globalName} tarafından istendi.`,
-                  iconURL: message.author.avatarURL({ dynamic: true }),
-                })
-                .setDescription(`Çarkı çevirdin ve ${prize} para kazandın!`),
-            ],
-          });
-        }
+    const randomEndAngle = Math.random() * (MAX_ANGLE - MIN_ANGLE) + MIN_ANGLE;
+    const wheel = generateSpinWheel(
+      options,
+      randomEndAngle,
+      DURATION,
+      FRAME_DELAY_MS,
+      styles.canvas.width,
+      styles.canvas.height,
+      LAST_FRAME_DURATION_MS
+    );
+    const spinWheelAttachment = new AttachmentBuilder(wheel.getGif(), {
+      name: "spin-wheel.gif",
+    });
+
+    const msg = await message.channel.send({
+      embeds: [
+        new EmbedBuilder()
+          .setTitle("Şanslı Çark Dönüyor!")
+          .setImage("attachment://spin-wheel.gif"),
+      ],
+      files: [spinWheelAttachment],
+    });
+    embed.delete();
+    setTimeout(async () => {
+      await msg.delete();
+
+      const selectedOptionAttachmment = new AttachmentBuilder(
+        wheel.getLastFrame(),
+        { name: "last-option.png" }
+      );
+
+      if (wheel.selectedOption != "PASS")
+        userData.wallet += wheel.selectedOption;
+      userData.save();
+      await message.channel.send({
+        embeds: [
+          new EmbedBuilder()
+            .setColor(wheel.selectedOptionColor)
+            .setTitle("Şanslı Çark Bitti!")
+            .setDescription(
+              `${
+                wheel.selectedOption != "PASS"
+                  ? `🏆 KAZANDINIZ: **${wheel.selectedOption}** Cash kazandınız!`
+                  : "**IFLAS** GELDİ! Bir daha ki sefere!"
+              }`
+            )
+            .setImage("attachment://last-option.png"),
+        ],
+        files: [selectedOptionAttachmment],
       });
-    }, 1000);
+    }, MAX_DURATION_MS);
   },
 };

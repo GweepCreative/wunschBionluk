@@ -59,8 +59,8 @@ module.exports = {
   },
 };
 function uretSeviyeyeGore(seviye) {
-  if (seviye < 10) {
-    return Math.floor(Math.random() * 10);
+  if (seviye < 15) {
+    return Math.floor(Math.random() * 30);
   } else {
     return Math.floor(Math.random() * 4);
   }

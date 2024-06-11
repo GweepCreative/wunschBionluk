@@ -40,7 +40,7 @@ module.exports = {
                 .setDescription(
                   "Bu komutu kullanmak için Bot Yöneticisi olman gerekiyor"
                 )
-                .setColor("RED"),
+                .setColor("Red"),
             ],
           });
           return;

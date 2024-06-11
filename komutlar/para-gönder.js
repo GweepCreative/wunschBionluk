@@ -16,7 +16,7 @@ module.exports = {
       isNaN(args[0].replace(/[<>@!]/g, "")) ||
       isNaN(args[1]) ||
       Number(args[1]) < 1 ||
-      Number(args[1]) > 10_000
+      Number(args[1]) > 10000
     )
       return message.reply(
         "Hata kullanım lütfen geçerli bilgiler giriniz.\nDoğru kullanım: !paragönder @user miktar"
@@ -43,7 +43,7 @@ module.exports = {
         embeds: [
           {
             description: `Hesabınızda yeteri kadar para bulunmuyor. Gerekli miktar \`${amount}\` 🪙 SGAT Cash`,
-            color: "RED",
+            color: "Red",
           },
         ],
       });
