@@ -14,24 +14,53 @@ module.exports = {
    * @param {Message} message
    */
   run: async (client, message, args) => {
-    const bet = Number(args[0]) || null;
+    let bet = Number(args[0]) || null;
     if (!bet || isNaN(bet) || bet < 1)
       return message.reply("Lütfen geçerli bir miktar girin.");
-    if(bet > 300) return message.reply("Maksimum 300 para ile oynayabilirsiniz.");
+    if (bet > 300)
+      return message.reply("Maksimum 300 para ile oynayabilirsiniz.");
     const userData =
       (await User.findOne({ id: message.author.id })) ||
       new User({ id: message.author.id });
     if (userData.wallet < bet) return message.reply("Yeterli paranız yok.");
     if (userData.cooldowns.slot > Date.now())
-      return message.reply(
-        `Bu komutu tekrar kullanabilmek için **${new Date(
-          userData.cooldowns.slot
-        ).toLocaleTimeString()}** tarihine kadar beklemelisin.`
-      );
+      return message.reply({
+        embeds: [
+          new EmbedBuilder().setColor("Yellow").setDescription(
+            `⌛ **\`${prettyMilliseconds(userData.cooldowns.slot - Date.now(), {
+              verbose: true,
+              secondDecimalDigits: 0,
+            })
+              .replace("minutes", "dakika")
+              .replace(
+                "seconds",
+                "saniye"
+              )}\`** içinde tekrar çalışabilirsiniz.`
+          ),
+        ],
+        ephemeral: true,
+      });
 
     userData.wallet -= bet;
-    userData.cooldowns.slot = Date.now() + 1000 * 15;
     userData.save();
+    if (message.member.user.id !== global.botOwner) {
+      await User.updateOne(
+        { id: interaction.member.user.id },
+        { $inc: { cooldowns: { blackjack: Date.now() + 1000 * 60 * 15 } } },
+        { upsert: true }
+      );
+      // userData.cooldowns.slot = Date.now() + 1000 * 30;
+      // await User.updateOne(
+      //   { id: message.author.id },
+      //   {
+      //     $set: {
+      //       "cooldowns.slot": Date.now() + 1000 * 30,
+      //     },
+      //   },
+      //   { upsert: true }
+      // );
+    }
+
     let spin = "<a:slot:1250092657879941201>";
     const embed = message.reply({
       embeds: [
@@ -86,7 +115,7 @@ module.exports = {
               .setTitle("Slot Oyunu Bitti!")
               .setDescription(
                 `${s1}${s2}${s3}  -  ${
-                  isWin ? `**${bet*2} Cash Kazandınız!**` : "**Kaybettiniz!**"
+                  isWin ? `**${bet * 2} Cash Kazandınız!**` : "**Kaybettiniz!**"
                 }`
               ),
           ],

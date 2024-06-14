@@ -1,30 +1,10 @@
 const {
-  MessageEmbed,
   Client,
-  CommandInteraction,
   Message,
   EmbedBuilder,
-  AttachmentBuilder,
 } = require("discord.js");
 const { User } = require("../utils/schemas");
 
-// import { parseArgsAsCsv } from '../../utils/commands';
-// import { generateSpinWheel } from './pick/spin-wheel';
-const { generateSpinWheel } = require("../utils/spin-wheel");
-
-const FRAME_DELAY_MS = 50;
-const MAX_DURATION_MS = 5000;
-const LAST_FRAME_DURATION_MS = 1000 / FRAME_DELAY_MS;
-const MIN_ANGLE = 360;
-const MAX_ANGLE = 360 * 8;
-const DURATION = MAX_DURATION_MS / FRAME_DELAY_MS;
-
-const styles = {
-  canvas: {
-    width: 250,
-    height: 250,
-  },
-};
 const carkData = [
   "PASS",
   200,
@@ -75,14 +55,28 @@ module.exports = {
       new User({ id: message.author.id });
     if (userData.wallet < bet) return message.reply("Yeterli paranız yok.");
     if (userData.cooldowns.cark > Date.now())
-      return message.reply(
-        `Bu komutu tekrar kullanabilmek için **${new Date(
-          userData.cooldowns.cark
-        ).toLocaleTimeString()}** tarihine kadar beklemelisin.`
-      );
+      return message.reply({
+        embeds: [
+          new EmbedBuilder().setColor("Yellow").setDescription(
+            `⌛ **\`${prettyMilliseconds(userData.cooldowns.cark - Date.now(), {
+              verbose: true,
+              secondDecimalDigits: 0,
+            })
+              .replace("minutes", "dakika")
+              .replace(
+                "seconds",
+                "saniye"
+              )}\`** içinde tekrar çalışabilirsiniz.`
+          ),
+        ],
+        ephemeral: true,
+      });
 
     userData.wallet -= bet;
-    userData.cooldowns.cark = Date.now() + 1000 * 3;
+    if (message.member.user.id !== global.botOwner) {
+      //await User.updateOne({id:interaction.member.user.id},{$inc:{cooldowns:{blackjack:Date.now() + 1000 * 60 * 15}}},{upsert:true})
+      userData.cooldowns.blackjack = Date.now() + 1000 * 60 * 2;
+    }
     userData.save();
     const options = carkData;
     const embed = await message.reply({
@@ -97,57 +91,28 @@ module.exports = {
           .setDescription("Çark hazırlanıyor <a:slot:1250092657879941201>"),
       ],
     });
-
-    const randomEndAngle = Math.random() * (MAX_ANGLE - MIN_ANGLE) + MIN_ANGLE;
-    const wheel = generateSpinWheel(
-      options,
-      randomEndAngle,
-      DURATION,
-      FRAME_DELAY_MS,
-      styles.canvas.width,
-      styles.canvas.height,
-      LAST_FRAME_DURATION_MS
-    );
-    const spinWheelAttachment = new AttachmentBuilder(wheel.getGif(), {
-      name: "spin-wheel.gif",
-    });
-
-    const msg = await message.channel.send({
-      embeds: [
-        new EmbedBuilder()
-          .setTitle("Şanslı Çark Dönüyor!")
-          .setImage("attachment://spin-wheel.gif"),
-      ],
-      files: [spinWheelAttachment],
-    });
-    embed.delete();
+    const prize = options[Math.floor(Math.random() * options.length)];
     setTimeout(async () => {
-      await msg.delete();
+      if (prize === "PASS")
+        return embed.edit({
+          embeds: [
+            new EmbedBuilder()
+              .setColor("Red")
+              .setTitle("Şanslı Çark")
+              .setDescription("Çark döndü ve kazanan çıkmadı. Kaybettiniz!"),
+          ],
+        });
 
-      const selectedOptionAttachmment = new AttachmentBuilder(
-        wheel.getLastFrame(),
-        { name: "last-option.png" }
-      );
-
-      if (wheel.selectedOption != "PASS")
-        userData.wallet += wheel.selectedOption;
+      userData.wallet += prize;
       userData.save();
-      await message.channel.send({
+      embed.edit({
         embeds: [
           new EmbedBuilder()
-            .setColor(wheel.selectedOptionColor)
-            .setTitle("Şanslı Çark Bitti!")
-            .setDescription(
-              `${
-                wheel.selectedOption != "PASS"
-                  ? `🏆 KAZANDINIZ: **${wheel.selectedOption}** Cash kazandınız!`
-                  : "**IFLAS** GELDİ! Bir daha ki sefere!"
-              }`
-            )
-            .setImage("attachment://last-option.png"),
+            .setColor("Green")
+            .setTitle("Şanslı Çark")
+            .setDescription(`Çark döndü ve **${prize}** katı kazandınız!`),
         ],
-        files: [selectedOptionAttachmment],
       });
-    }, MAX_DURATION_MS);
+    }, 2000);
   },
 };
