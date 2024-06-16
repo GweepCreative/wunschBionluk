@@ -9,21 +9,6 @@ const carkData = [
   "PASS",
   200,
   200,
-  "PASS",
-  200,
-  300,
-  "PASS",
-  300,
-  300,
-  "PASS",
-  300,
-  "PASS",
-  400,
-  400,
-  "PASS",
-  400,
-  "PASS",
-  400,
   500,
   "PASS",
   600,
@@ -74,7 +59,6 @@ module.exports = {
 
     userData.wallet -= bet;
     if (message.member.user.id !== global.botOwner) {
-      //await User.updateOne({id:interaction.member.user.id},{$inc:{cooldowns:{blackjack:Date.now() + 1000 * 60 * 15}}},{upsert:true})
       userData.cooldowns.blackjack = Date.now() + 1000 * 60 * 2;
     }
     userData.save();
@@ -84,6 +68,7 @@ module.exports = {
         new EmbedBuilder()
           .setColor("Gold")
           .setTitle("Şanslı Çark Başladı!")
+          .setImage("https://gcdn.bionluk.com/uploads/message/06c32f27-5696-49ee-a190-1278247c4ddd.png")
           .setFooter({
             text: `${message.author.globalName} tarafından istendi.`,
             iconURL: message.author.avatarURL({ dynamic: true }),
@@ -110,7 +95,7 @@ module.exports = {
           new EmbedBuilder()
             .setColor("Green")
             .setTitle("Şanslı Çark")
-            .setDescription(`Çark döndü ve **${prize}** katı kazandınız!`),
+            .setDescription(`Çark döndü ve **${prize}** SGTK kazandınız!`),
         ],
       });
     }, 2000);

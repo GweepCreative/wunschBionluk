@@ -32,7 +32,7 @@ module.exports = {
     switch (subCmd) {
       case "ayarla": {
 		  if(!args[1]) return message.reply("Lütfen bir seviye belirtiniz\nDoğru kullanım: !level ayarla <seviye> @user")
-        if (message.member.user.id != botOwner) {
+        if (message.member.user.id != global.botOwner) {
           message.reply({
             ephemeral: true,
             embeds: [
