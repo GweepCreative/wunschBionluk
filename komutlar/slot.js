@@ -74,7 +74,20 @@ module.exports = {
           .setDescription(`${spin}${spin}${spin}`),
       ],
     });
-    let slot1 = ["🍇", "🍉", "🍊", "🍋", "🍌", "🍍", "🍎", "🍏"];
+    let slot1 = [
+      "🍇",
+      "🍇",
+      "🍇",
+      "🍇",
+      "🍊",
+      "🍋",
+      "🍋",
+      "🍋",
+      "🍋",
+      "🍌",
+      "🍎",
+      "🍏",
+    ];
     let s1 = slot1[Math.floor(Math.random() * slot1.length)];
     let s2 = slot1[Math.floor(Math.random() * slot1.length)];
     let s3 = slot1[Math.floor(Math.random() * slot1.length)];

@@ -16,7 +16,6 @@ const {
 } = require("canvacord");
 // load default font
 Font.loadDefault();
-const { botOwner } = require("../ayarlar.json");
 const { User } = require("../utils/schemas");
 module.exports = {
   name: "level",
